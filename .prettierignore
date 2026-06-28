@@ -1,0 +1,8 @@
+node_modules
+.next
+out
+public
+DESIGN.md
+DEVELOPMENT_PLAN.md
+CodeSage_Project_Draft.md
+.agents
