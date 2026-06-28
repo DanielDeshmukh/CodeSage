@@ -1,65 +1,126 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScoreDisplay } from "@/components/features/score-display";
+import Link from "next/link";
+
+const mockScores = {
+  architecture: 0.85,
+  codeDetail: 0.72,
+  scalability: 0.68,
+  overall: 0.75,
+};
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="mx-auto max-w-7xl px-6 py-12">
+      {/* Hero Section */}
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold tracking-tight text-on-dark sm:text-5xl">
+          Welcome to{" "}
+          <span className="text-primary">CodeSage</span>
+        </h1>
+        <p className="mt-4 text-lg text-muted max-w-2xl">
+          AI-powered codebase examiner for viva preparation, project review, and
+          interview readiness. Understand your code deeply.
+        </p>
+        <div className="mt-8 flex gap-4">
+          <Link href="/repositories">
+            <Button variant="primary" size="lg">
+              Get Started
+            </Button>
+          </Link>
+          <Link href="/docs">
+            <Button variant="secondary-dark" size="lg">
+              View Documentation
+            </Button>
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+        <Card variant="dark">
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted">Repositories Analyzed</p>
+            <p className="text-3xl font-bold text-primary mt-2">0</p>
+          </CardContent>
+        </Card>
+        <Card variant="dark">
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted">Questions Generated</p>
+            <p className="text-3xl font-bold text-primary mt-2">0</p>
+          </CardContent>
+        </Card>
+        <Card variant="dark">
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted">Exams Completed</p>
+            <p className="text-3xl font-bold text-primary mt-2">0</p>
+          </CardContent>
+        </Card>
+        <Card variant="dark">
+          <CardContent className="pt-6">
+            <p className="text-sm text-muted">Average Score</p>
+            <p className="text-3xl font-bold text-primary mt-2">--</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Demo Score Display */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-semibold text-on-dark mb-6">
+          Demo: Score Display
+        </h2>
+        <ScoreDisplay scores={mockScores} />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card variant="dark">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              Connect Repository
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted">
+              Connect your GitHub repository to start analyzing your codebase with AI.
+            </p>
+          </CardContent>
+        </Card>
+        <Card variant="dark">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              Start Exam
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted">
+              Begin an interactive exam session to test your understanding of the codebase.
+            </p>
+          </CardContent>
+        </Card>
+        <Card variant="dark">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              View Reports
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted">
+              Review your performance scores and get personalized study recommendations.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
