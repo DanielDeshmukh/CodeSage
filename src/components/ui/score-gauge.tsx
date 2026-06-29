@@ -37,16 +37,16 @@ const ScoreGauge = forwardRef<HTMLDivElement, ScoreGaugeProps>(
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
     const getColor = (pct: number) => {
-      if (pct >= 80) return "#00ca8e";
-      if (pct >= 60) return "#ffcf25";
-      if (pct >= 40) return "#2b89ff";
-      return "#e62b1e";
+      if (pct >= 80) return "#48bb78";
+      if (pct >= 60) return "#c9a962";
+      if (pct >= 40) return "#e8d5a3";
+      return "#fc8181";
     };
 
     const getTextColor = (pct: number) => {
       if (pct >= 80) return "text-success";
-      if (pct >= 60) return "text-vault";
-      if (pct >= 40) return "text-accent-blue";
+      if (pct >= 60) return "text-primary";
+      if (pct >= 40) return "text-primary-active";
       return "text-danger";
     };
 

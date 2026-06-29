@@ -163,10 +163,10 @@ export class ScoreAggregator {
   }
 
   getScoreColor(score: number): string {
-    if (score >= 80) return "#0ecb81";
-    if (score >= 60) return "#ffcf25";
-    if (score >= 40) return "#ffcf25";
-    return "#f6465d";
+    if (score >= 80) return "#48bb78";
+    if (score >= 60) return "#c9a962";
+    if (score >= 40) return "#e8d5a3";
+    return "#fc8181";
   }
 
   getScoreLabel(score: number): string {

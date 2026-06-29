@@ -1,44 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* HashiCorp Dark Theme */
-  --color-canvas-dark: #000000;
-  --color-surface-card: #15181e;
-  --color-surface-elevated: #1f232b;
-  --color-surface-3: #3b3d45;
-  --color-primary: #ffffff;
-  --color-primary-active: #e5e7eb;
-  --color-primary-disabled: #3b3d45;
-  --color-ink: #ffffff;
-  --color-body: #ffffff;
-  --color-muted: #b2b6bd;
-  --color-muted-strong: #b2b6bd;
-  --color-subtle: #656a76;
-  --color-hairline: #3b3d45;
-  --color-hairline-soft: #252830;
-  --color-border-strong: #656a76;
-  --color-success: #00ca8e;
-  --color-danger: #e62b1e;
-  --color-warning: #ffcf25;
-  --color-info: #2b89ff;
-  --color-accent-blue: #2b89ff;
-  --color-terraform: #7b42bc;
-  --color-vault: #ffcf25;
-  --color-consul: #e62b1e;
-  --color-waypoint: #14c6cb;
-  --color-vagrant: #1868f2;
-  --color-nomad: #00ca8e;
-  --color-boundary: #f24c53;
+  /* Color Theme — edit these to retheme the entire app */
+  --color-charcoal: #1a1a1a;
+  --color-cream: #111315;
+  --color-gold: #c9a962;
+  --color-gold-light: #e8d5a3;
+  --color-slate: #2d3748;
+  --color-silver: #7d8a96;
+
+  /* Semantic mappings — change these to remap theme → app */
+  --color-canvas-dark: var(--color-cream);
+  --color-surface-card: var(--color-charcoal);
+  --color-surface-elevated: var(--color-slate);
+  --color-surface-3: #3a4758;
+  --color-primary: var(--color-gold);
+  --color-primary-active: var(--color-gold-light);
+  --color-primary-disabled: #3a3520;
+  --color-ink: #f5f0e8;
+  --color-body: #d4cfc5;
+  --color-muted: var(--color-silver);
+  --color-muted-strong: var(--color-silver);
+  --color-subtle: #4a5568;
+  --color-hairline: #2a3040;
+  --color-hairline-soft: #1e2530;
+  --color-border-strong: var(--color-silver);
+  --color-success: #48bb78;
+  --color-danger: #fc8181;
+  --color-warning: var(--color-gold);
+  --color-info: var(--color-gold-light);
+  --color-accent-blue: var(--color-gold);
 
   /* Legacy aliases */
-  --color-canvas-light: #000000;
-  --color-surface-soft: #15181e;
-  --color-surface-strong: #1f232b;
-  --color-body-on-light: #ffffff;
-  --color-hairline-on-light: #3b3d45;
-  --color-trading-up: #00ca8e;
-  --color-trading-down: #e62b1e;
-  --color-accent-turquoise: #14c6cb;
+  --color-canvas-light: var(--color-cream);
+  --color-surface-soft: var(--color-charcoal);
+  --color-surface-strong: var(--color-slate);
+  --color-body-on-light: var(--color-ink);
+  --color-hairline-on-light: var(--color-hairline);
+  --color-trading-up: #48bb78;
+  --color-trading-down: #fc8181;
+  --color-accent-turquoise: var(--color-gold-light);
 }
 
 @theme inline {
@@ -55,10 +56,15 @@
   --color-danger: var(--color-danger);
   --color-warning: var(--color-warning);
   --color-info: var(--color-info);
-  --color-turquoise: var(--color-waypoint);
-  --color-terraform: var(--color-terraform);
-  --color-vault: var(--color-vault);
-  --color-nomad: var(--color-nomad);
+  --color-accent-blue: var(--color-gold);
+  --color-turquoise: var(--color-gold-light);
+  --color-terraform: var(--color-gold);
+  --color-vault: var(--color-gold-light);
+  --color-consul: var(--color-danger);
+  --color-waypoint: var(--color-gold-light);
+  --color-nomad: var(--color-success);
+  --color-vagrant: var(--color-gold);
+  --color-boundary: var(--color-danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -96,12 +102,12 @@ body {
 
 /* Selection */
 ::selection {
-  background: rgba(43, 137, 255, 0.3);
+  background: rgba(201, 169, 98, 0.3);
   color: var(--color-ink);
 }
 
 /* Focus ring */
 :focus-visible {
-  outline: 1px solid var(--color-accent-blue);
+  outline: 1px solid var(--color-gold);
   outline-offset: 2px;
 }
