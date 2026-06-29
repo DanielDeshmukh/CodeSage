@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { label: "Dashboard", href: "/" },
+  { label: "Dashboard", href: "/dashboard" },
   { label: "Repositories", href: "/repositories" },
-  { label: "Exam", href: "/exam" },
-  { label: "Results", href: "/results" },
+  { label: "Exam", href: "/exam/select" },
+  { label: "History", href: "/results" },
 ];
 
 export function Header() {
@@ -40,12 +40,16 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm">
-            Settings
-          </Button>
-          <Button variant="primary" size="sm">
-            Connect GitHub
-          </Button>
+          <Link href="/settings">
+            <Button variant="ghost" size="sm">
+              Settings
+            </Button>
+          </Link>
+          <Link href="/repositories/submit">
+            <Button variant="primary" size="sm">
+              Add Repository
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
