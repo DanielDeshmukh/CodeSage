@@ -4,7 +4,7 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     // NIM API Configuration
-    NIM_API_KEY: z.string().min(1, "NIM API key is required"),
+    NIM_API_KEY: z.string().default(""),
     NIM_BASE_URL: z.string().url("NIM base URL must be a valid URL"),
 
     // Model Endpoints

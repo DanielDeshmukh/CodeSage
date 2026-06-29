@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QuestionCard } from "@/components/features/question-card";
 import { ScoreDisplay } from "@/components/features/score-display";
-import type { ExamSession, ExamQuestion } from "@/types";
+import type { ExamSession } from "@/types";
 
 export default function ExamSessionPage() {
   const params = useParams();
@@ -18,11 +18,7 @@ export default function ExamSessionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSession();
-  }, [sessionId]);
-
-  const fetchSession = async () => {
+  const fetchSession = useCallback(async () => {
     try {
       const response = await fetch(`/api/exam?sessionId=${sessionId}`);
       if (!response.ok) {
@@ -35,7 +31,14 @@ export default function ExamSessionPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sessionId]);
+
+  useEffect(() => {
+    const loadSession = async () => {
+      await fetchSession();
+    };
+    loadSession();
+  }, [fetchSession]);
 
   const handleAnswer = async (questionId: string, answer: string) => {
     try {

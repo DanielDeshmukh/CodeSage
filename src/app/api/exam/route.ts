@@ -116,7 +116,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Return all sessions (for demo purposes)
-    const { getSession } = await import("@/ai/examiner/session");
     // This would normally query a database
     return NextResponse.json({ sessions: [] });
   } catch (error) {
