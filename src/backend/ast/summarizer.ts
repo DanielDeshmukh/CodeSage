@@ -76,7 +76,7 @@ export class ChunkSummarizer {
     chunk: NormalizedChunk,
     options?: SummaryOptions
   ): string {
-    return `Summarize the following ${chunk.type} "${chunk.name}" from ${chunk.filePath || "unknown"}:
+    return `Summarize the following ${chunk.type} "${chunk.name}":
 
 \`\`\`${chunk.language}
 ${chunk.content.slice(0, 2000)}
