@@ -50,7 +50,7 @@ const SUPPORTED_LANGUAGES = [
 // Language-specific parsers (simplified implementations)
 // ============================================================================
 
-function parseTypeScript(content: string, filePath: string): ParsedChunk[] {
+function parseTypeScript(content: string, _filePath: string): ParsedChunk[] {
   const chunks: ParsedChunk[] = [];
   const lines = content.split("\n");
 
@@ -158,7 +158,7 @@ function parseTypeScript(content: string, filePath: string): ParsedChunk[] {
   return chunks;
 }
 
-function parsePython(content: string, filePath: string): ParsedChunk[] {
+function parsePython(content: string, _filePath: string): ParsedChunk[] {
   const chunks: ParsedChunk[] = [];
   const lines = content.split("\n");
 

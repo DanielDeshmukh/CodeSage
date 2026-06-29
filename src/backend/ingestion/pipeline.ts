@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { getGitHubClient, type GitHubFile } from "@/services/github";
+import { getGitHubClient } from "@/services/github";
 import { getNIMGateway } from "@/ai/nim/gateway";
 import { getQdrantClient, type QdrantPoint } from "@/backend/vector/qdrant";
 import { parseFile, getLanguageFromFilePath, type ParsedChunk } from "@/backend/ast/parser";

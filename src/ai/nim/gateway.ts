@@ -1,10 +1,7 @@
 import { env } from "@/lib/env";
 import type {
-  EmbeddingRequest,
   EmbeddingResponse,
-  RerankRequest,
   RerankResponse,
-  ChatRequest,
   ChatResponse,
   ChatMessage,
 } from "@/types";

@@ -1,5 +1,4 @@
 import { env } from "@/lib/env";
-import type { CodeChunk } from "@/types";
 
 // ============================================================================
 // Qdrant Vector Database Client
