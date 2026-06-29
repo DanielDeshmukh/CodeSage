@@ -130,7 +130,7 @@ describe("Exam Flow Integration", () => {
               missedPoints: ["Service layer"],
             }),
           },
-        ],
+        },
       ],
     });
 
