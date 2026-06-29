@@ -45,7 +45,7 @@ export default function RepositorySubmitPage() {
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-on-dark">Add Repository</h1>
+        <h1 className="text-3xl font-bold text-ink">Add Repository</h1>
         <p className="mt-2 text-muted">
           Connect a GitHub repository to analyze with AI
         </p>
@@ -78,7 +78,7 @@ export default function RepositorySubmitPage() {
             </div>
 
             <div className="rounded-lg bg-surface-elevated p-4">
-              <h3 className="text-sm font-medium text-on-dark">
+              <h3 className="text-sm font-medium text-ink">
                 What happens next?
               </h3>
               <ul className="mt-2 space-y-2 text-sm text-muted">

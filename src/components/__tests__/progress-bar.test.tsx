@@ -25,7 +25,7 @@ describe("ProgressBar", () => {
 
   it("should apply size classes", () => {
     const { container } = render(<ProgressBar value={50} size="lg" />);
-    expect(container.querySelector(".h-3")).toBeInTheDocument();
+    expect(container.querySelector(".h-2")).toBeInTheDocument();
   });
 
   it("should apply color classes", () => {

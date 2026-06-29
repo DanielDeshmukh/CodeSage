@@ -2,34 +2,35 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info focus-visible:ring-offset-2 focus-visible:ring-offset-canvas-dark disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue focus-visible:ring-offset-2 focus-visible:ring-offset-canvas-dark disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
         primary:
-          "bg-primary text-ink hover:bg-primary-active active:bg-primary-active",
-        "primary-pill":
-          "bg-primary text-ink rounded-full hover:bg-primary-active active:bg-primary-active",
-        "secondary-dark":
-          "bg-surface text-on-dark hover:bg-surface-elevated active:bg-surface-elevated",
-        "secondary-light":
-          "bg-canvas-light text-ink border border-hairline-on-light hover:bg-surface-soft active:bg-surface-soft",
-        tertiary: "bg-transparent text-body hover:text-on-dark",
-        "trading-up":
-          "bg-success text-on-dark hover:opacity-90 active:opacity-90",
-        "trading-down":
-          "bg-danger text-on-dark hover:opacity-90 active:opacity-90",
-        danger:
-          "bg-danger text-on-dark hover:opacity-90 active:opacity-90",
+          "bg-white text-black hover:bg-gray-200 active:bg-gray-300",
+        secondary:
+          "bg-surface-elevated text-ink border border-hairline hover:bg-surface-3 active:bg-surface-3",
+        tertiary:
+          "bg-transparent text-ink hover:bg-surface-card active:bg-surface-card",
         ghost:
-          "bg-transparent text-body hover:bg-surface hover:text-on-dark",
+          "bg-transparent text-muted hover:text-ink hover:bg-surface-card",
+        danger:
+          "bg-danger text-white hover:opacity-90 active:opacity-90",
+        success:
+          "bg-success text-black hover:opacity-90 active:opacity-90",
+        terraform:
+          "bg-terraform text-white hover:opacity-90 active:opacity-90",
+        vault:
+          "bg-vault text-black hover:opacity-90 active:opacity-90",
+        waypoint:
+          "bg-waypoint text-black hover:opacity-90 active:opacity-90",
       },
       size: {
-        sm: "h-8 px-4 text-sm",
-        md: "h-10 px-6 text-sm",
-        lg: "h-12 px-8 text-base",
-        icon: "h-10 w-10",
-        "icon-sm": "h-8 w-8",
+        sm: "h-8 px-3 text-xs rounded",
+        md: "h-10 px-5 text-sm rounded",
+        lg: "h-12 px-7 text-base rounded",
+        icon: "h-10 w-10 rounded",
+        "icon-sm": "h-8 w-8 rounded",
       },
     },
     defaultVariants: {

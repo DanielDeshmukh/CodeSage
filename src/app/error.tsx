@@ -11,7 +11,7 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-canvas-dark text-on-dark">
+      <body className="min-h-screen bg-canvas-dark text-ink">
         <div className="flex min-h-screen flex-col items-center justify-center p-8">
           <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-10 text-center">
             <div className="mx-auto mb-6 h-48 w-48 relative">
@@ -26,7 +26,7 @@ export default function GlobalError({
 
             <div className="mb-4 text-7xl font-bold text-danger">500</div>
 
-            <h1 className="mb-3 text-2xl font-bold text-on-dark">
+            <h1 className="mb-3 text-2xl font-bold text-ink">
               Well, this is embarrassing...
             </h1>
 

@@ -51,7 +51,7 @@ export function Sidebar({ repositoryId }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 border-r border-hairline bg-canvas-dark lg:block">
+    <aside className="hidden w-64 border-r border-hairline bg-surface lg:block">
       <div className="flex h-full flex-col">
         <div className="flex-1 overflow-y-auto px-3 py-4">
           <nav className="space-y-1">
@@ -68,13 +68,13 @@ export function Sidebar({ repositoryId }: SidebarProps) {
                   key={item.href}
                   href={href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-3 rounded px-3 py-2 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-surface text-on-dark"
-                      : "text-muted hover:bg-surface hover:text-on-dark"
+                      ? "bg-surface-elevated text-ink"
+                      : "text-muted hover:bg-surface-elevated hover:text-ink"
                   )}
                 >
-                  <span className={cn(isActive ? "text-primary" : "text-muted")}>
+                  <span className={cn(isActive ? "text-ink" : "text-muted")}>
                     {item.icon}
                   </span>
                   {item.label}
@@ -84,8 +84,8 @@ export function Sidebar({ repositoryId }: SidebarProps) {
           </nav>
         </div>
         <div className="border-t border-hairline p-4">
-          <div className="rounded-lg bg-surface p-4">
-            <p className="text-sm font-medium text-on-dark">Need Help?</p>
+          <div className="rounded bg-surface-elevated p-4 border border-hairline">
+            <p className="text-sm font-medium text-ink">Need Help?</p>
             <p className="mt-1 text-xs text-muted">
               Check our documentation for guides and API references.
             </p>

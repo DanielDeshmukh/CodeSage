@@ -54,7 +54,7 @@ export default function ScoreReportPage() {
       {/* Header */}
       <div className="mb-8 flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-on-dark">Score Report</h1>
+          <h1 className="text-3xl font-bold text-ink">Score Report</h1>
           <p className="mt-2 text-muted">
             {mockReport.repositoryName} • {mockReport.mode} mode
           </p>
@@ -126,7 +126,7 @@ export default function ScoreReportPage() {
             ].map((dim) => (
               <div key={dim.name} className="flex items-center gap-4">
                 <div className="w-32">
-                  <p className="font-medium text-on-dark">{dim.name}</p>
+                  <p className="font-medium text-ink">{dim.name}</p>
                   <p className="text-xs text-muted">{dim.description}</p>
                 </div>
                 <div className="flex-1">
@@ -174,7 +174,7 @@ export default function ScoreReportPage() {
                     {i + 1}
                   </span>
                   <div className="flex-1">
-                    <p className="font-medium text-on-dark">{q.question}</p>
+                    <p className="font-medium text-ink">{q.question}</p>
                     <p className="mt-1 text-sm text-muted">{q.filePath}</p>
                     <div className="mt-3 grid grid-cols-3 gap-4">
                       <div>

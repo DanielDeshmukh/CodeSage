@@ -37,7 +37,7 @@ export default function ExamSessionPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-on-dark">Exam Session</h1>
+          <h1 className="text-2xl font-bold text-ink">Exam Session</h1>
           <p className="mt-1 text-muted">
             Question {currentQuestion} of {totalQuestions}
           </p>
@@ -45,7 +45,7 @@ export default function ExamSessionPage() {
         <div className="flex items-center gap-6">
           <div className="text-right">
             <p className="text-xs text-muted">Time Elapsed</p>
-            <p className="font-mono text-lg font-bold text-on-dark">
+            <p className="font-mono text-lg font-bold text-ink">
               {Math.floor(timeElapsed / 60)
                 .toString()
                 .padStart(2, "0")}
@@ -154,7 +154,7 @@ export default function ExamSessionPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="text-sm font-medium text-on-dark">Answering Tips</p>
+              <p className="text-sm font-medium text-ink">Answering Tips</p>
               <p className="mt-1 text-sm text-muted">
                 Be specific about implementation details. Mention the file path, function name, and line numbers
                 when relevant. Explain the &quot;why&quot; behind decisions, not just the &quot;what&quot;.

@@ -25,7 +25,7 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-on-dark">Settings</h1>
+        <h1 className="text-3xl font-bold text-ink">Settings</h1>
         <p className="mt-2 text-muted">
           Configure your CodeSage preferences and API keys
         </p>
@@ -39,7 +39,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-on-dark">
+              <label className="mb-2 block text-sm font-medium text-ink">
                 GitHub Token
               </label>
               <Input
@@ -57,7 +57,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-on-dark">
+              <label className="mb-2 block text-sm font-medium text-ink">
                 NVIDIA NIM API Key
               </label>
               <Input
@@ -84,13 +84,13 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-on-dark">
+              <label className="mb-2 block text-sm font-medium text-ink">
                 Default Exam Mode
               </label>
               <select
                 value={defaultMode}
                 onChange={(e) => setDefaultMode(e.target.value)}
-                className="w-full rounded-lg border border-hairline bg-surface px-4 py-2 text-sm text-on-dark focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-hairline bg-surface px-4 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="viva">Viva Voce</option>
                 <option value="interview">Interview Prep</option>
@@ -98,13 +98,13 @@ export default function SettingsPage() {
               </select>
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-on-dark">
+              <label className="mb-2 block text-sm font-medium text-ink">
                 Default Question Count
               </label>
               <select
                 value={questionCount}
                 onChange={(e) => setQuestionCount(e.target.value)}
-                className="w-full rounded-lg border border-hairline bg-surface px-4 py-2 text-sm text-on-dark focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-lg border border-hairline bg-surface px-4 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="5">5 questions</option>
                 <option value="10">10 questions</option>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-on-dark">Reset All Data</p>
+                <p className="font-medium text-ink">Reset All Data</p>
                 <p className="text-sm text-muted">
                   Delete all repositories, sessions, and scores
                 </p>

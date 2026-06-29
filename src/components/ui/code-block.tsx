@@ -13,20 +13,20 @@ interface CodeBlockProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const languageColors: Record<string, string> = {
-  typescript: "bg-info/20 text-info",
-  javascript: "bg-primary/20 text-primary",
-  python: "bg-success/20 text-success",
-  java: "bg-danger/20 text-danger",
-  go: "bg-info/20 text-info",
-  rust: "bg-primary/20 text-primary",
-  cpp: "bg-info/20 text-info",
-  c: "bg-muted/20 text-muted",
-  csharp: "bg-success/20 text-success",
-  ruby: "bg-danger/20 text-danger",
-  php: "bg-info/20 text-info",
-  swift: "bg-danger/20 text-danger",
-  kotlin: "bg-primary/20 text-primary",
-  scala: "bg-danger/20 text-danger",
+  typescript: "bg-accent-blue/15 text-accent-blue",
+  javascript: "bg-vault/15 text-vault",
+  python: "bg-nomad/15 text-nomad",
+  java: "bg-consul/15 text-consul",
+  go: "bg-waypoint/15 text-waypoint",
+  rust: "bg-terraform/15 text-terraform",
+  cpp: "bg-accent-blue/15 text-accent-blue",
+  c: "bg-muted/15 text-muted",
+  csharp: "bg-waypoint/15 text-waypoint",
+  ruby: "bg-consul/15 text-consul",
+  php: "bg-accent-blue/15 text-accent-blue",
+  swift: "bg-consul/15 text-consul",
+  kotlin: "bg-terraform/15 text-terraform",
+  scala: "bg-consul/15 text-consul",
 };
 
 const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(
@@ -46,7 +46,7 @@ const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(
     const [copied, setCopied] = useState(false);
 
     const lines = code.split("\n");
-    const langColor = languageColors[language] || "bg-muted/20 text-muted";
+    const langColor = languageColors[language] || "bg-muted/15 text-muted";
 
     const handleCopy = async () => {
       await navigator.clipboard.writeText(code);
@@ -58,24 +58,23 @@ const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(
       <div
         ref={ref}
         className={cn(
-          "overflow-hidden rounded-xl border border-hairline bg-surface",
+          "overflow-hidden rounded-lg border border-hairline bg-surface",
           className
         )}
         {...props}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-hairline px-4 py-2">
           <div className="flex items-center gap-3">
             {filename && (
-              <span className="text-xs font-medium text-on-dark">{filename}</span>
+              <span className="text-xs font-medium text-ink">{filename}</span>
             )}
-            <span className={cn("rounded px-2 py-0.5 text-xs font-medium", langColor)}>
+            <span className={cn("rounded px-2 py-0.5 text-[10px] font-medium", langColor)}>
               {language}
             </span>
           </div>
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 text-xs text-muted hover:text-on-dark transition-colors"
+            className="flex items-center gap-1.5 text-xs text-muted hover:text-ink transition-colors"
           >
             {copied ? (
               <>
@@ -95,7 +94,6 @@ const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(
           </button>
         </div>
 
-        {/* Code Content */}
         <div
           className="overflow-auto"
           style={{ maxHeight }}
@@ -111,15 +109,15 @@ const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(
                     key={i}
                     className={cn(
                       "flex",
-                      isHighlighted && "bg-primary/5 -mx-4 px-4 border-l-2 border-primary"
+                      isHighlighted && "bg-white/5 -mx-4 px-4 border-l-2 border-white"
                     )}
                   >
                     {showLineNumbers && (
-                      <span className="mr-4 w-8 select-none text-right text-muted/50">
+                      <span className="mr-4 w-8 select-none text-right text-subtle">
                         {lineNum}
                       </span>
                     )}
-                    <span className="flex-1 text-body">{line}</span>
+                    <span className="flex-1 text-ink">{line}</span>
                   </div>
                 );
               })}

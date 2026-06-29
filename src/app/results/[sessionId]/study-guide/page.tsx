@@ -54,7 +54,7 @@ export default function StudyGuidePage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-on-dark">Study Guide</h1>
+        <h1 className="text-3xl font-bold text-ink">Study Guide</h1>
         <p className="mt-2 text-muted">
           Personalized recommendations based on your exam performance
         </p>
@@ -70,7 +70,7 @@ export default function StudyGuidePage() {
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-on-dark">
+              <h2 className="text-lg font-semibold text-ink">
                 {mockStudyGuide.length} Areas to Focus On
               </h2>
               <p className="text-sm text-muted">
@@ -103,7 +103,7 @@ export default function StudyGuidePage() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-on-dark">{item.issue}</p>
+                      <p className="font-medium text-ink">{item.issue}</p>
                       <p className="mt-1 text-sm text-muted">
                         {item.filePath}:{item.lineNumber}
                         {item.functionName && ` • ${item.functionName}()`}

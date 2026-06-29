@@ -65,7 +65,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-on-dark">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-ink">Dashboard</h1>
         <p className="mt-2 text-muted">
           Overview of your repositories and exam sessions
         </p>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
                   className="flex items-center justify-between rounded-lg border border-hairline p-4"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-on-dark truncate">
+                    <p className="font-medium text-ink truncate">
                       {repo.name}
                     </p>
                     <p className="text-xs text-muted truncate">{repo.fullName}</p>
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                   className="flex items-center justify-between rounded-lg border border-hairline p-4"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-on-dark">
+                    <p className="font-medium text-ink">
                       {session.repositoryName}
                     </p>
                     <p className="text-xs text-muted capitalize">
@@ -205,7 +205,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-on-dark">Add Repository</p>
+                <p className="font-medium text-ink">Add Repository</p>
                 <p className="text-sm text-muted">Connect a new GitHub repo</p>
               </div>
             </CardContent>
@@ -220,7 +220,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-on-dark">Start Exam</p>
+                <p className="font-medium text-ink">Start Exam</p>
                 <p className="text-sm text-muted">Test your code knowledge</p>
               </div>
             </CardContent>
@@ -235,7 +235,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-on-dark">View Reports</p>
+                <p className="font-medium text-ink">View Reports</p>
                 <p className="text-sm text-muted">Review your scores</p>
               </div>
             </CardContent>

@@ -18,7 +18,7 @@ export default function SignupPage() {
               priority
             />
           </div>
-          <h1 className="text-2xl font-bold text-on-dark">Join CodeSage</h1>
+          <h1 className="text-2xl font-bold text-ink">Join CodeSage</h1>
           <p className="mt-2 text-sm text-muted">
             Start mastering your codebase with AI-powered examinations
           </p>

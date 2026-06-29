@@ -48,11 +48,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           if (e.target === overlayRef.current) onClose();
         }}
       >
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
         <div
           ref={ref}
           className={cn(
-            "relative w-full rounded-xl bg-surface p-6 shadow-lg",
+            "relative w-full rounded-lg bg-surface p-6 shadow-lg border border-hairline",
             sizeClasses[size],
             className
           )}
@@ -61,7 +61,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           {showClose && (
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 text-muted hover:text-on-dark transition-colors"
+              className="absolute right-4 top-4 text-muted hover:text-ink transition-colors"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -86,7 +86,7 @@ ModalHeader.displayName = "ModalHeader";
 
 const ModalTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h2 ref={ref} className={cn("text-lg font-semibold text-on-dark", className)} {...props} />
+    <h2 ref={ref} className={cn("text-lg font-semibold text-ink", className)} {...props} />
   )
 );
 ModalTitle.displayName = "ModalTitle";

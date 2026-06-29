@@ -6,10 +6,12 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        dark: "bg-surface rounded-xl",
-        elevated: "bg-surface-elevated rounded-xl",
-        light: "bg-canvas-light rounded-lg",
+        dark: "bg-surface rounded-lg border border-hairline",
+        elevated: "bg-surface-elevated rounded-lg border border-hairline",
         transparent: "bg-transparent",
+        terraform: "bg-terraform rounded-lg text-white",
+        vault: "bg-vault rounded-lg text-black",
+        waypoint: "bg-waypoint rounded-lg text-black",
       },
       padding: {
         none: "p-0",
@@ -59,7 +61,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingEleme
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={`text-lg font-semibold leading-none tracking-tight ${className || ""}`}
+      className={`text-lg font-semibold leading-none tracking-tight text-ink ${className || ""}`}
       {...props}
     />
   )

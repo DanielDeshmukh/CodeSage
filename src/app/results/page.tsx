@@ -63,7 +63,7 @@ export default function ExamHistoryPage() {
     <div className="mx-auto max-w-6xl px-6 py-12">
       <div className="mb-8 flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-on-dark">Exam History</h1>
+          <h1 className="text-3xl font-bold text-ink">Exam History</h1>
           <p className="mt-2 text-muted">
             View your past examination sessions and performance trends
           </p>
@@ -152,7 +152,7 @@ export default function ExamHistoryPage() {
                   >
                     <td className="py-4">
                       <div>
-                        <p className="font-medium text-on-dark">
+                        <p className="font-medium text-ink">
                           {session.repositoryName}
                         </p>
                         <p className="text-xs text-muted">

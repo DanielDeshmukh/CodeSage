@@ -19,7 +19,7 @@ export default function NotFound() {
 
         <div className="mb-4 text-7xl font-bold text-primary">404</div>
 
-        <h1 className="mb-3 text-2xl font-bold text-on-dark">
+        <h1 className="mb-3 text-2xl font-bold text-ink">
           Seems like we&apos;re lost...
         </h1>
 

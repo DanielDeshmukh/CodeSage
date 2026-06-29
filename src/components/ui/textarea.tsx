@@ -2,16 +2,15 @@ import { TextareaHTMLAttributes, forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const textareaVariants = cva(
-  "flex w-full font-body transition-colors placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info focus-visible:ring-offset-2 focus-visible:ring-offset-canvas-dark disabled:cursor-not-allowed disabled:opacity-50 resize-none",
+  "flex w-full font-sans transition-colors placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue focus-visible:ring-offset-2 focus-visible:ring-offset-canvas-dark disabled:cursor-not-allowed disabled:opacity-40 resize-none",
   {
     variants: {
       variant: {
-        dark: "bg-surface text-on-dark border border-hairline rounded-lg",
-        light: "bg-canvas-light text-ink border border-hairline-on-light rounded-md",
-        ghost: "bg-transparent text-on-dark border-none",
+        dark: "bg-surface text-ink border border-hairline rounded",
+        ghost: "bg-transparent text-ink border-none",
       },
       inputSize: {
-        sm: "min-h-[80px] px-3 py-2 text-sm",
+        sm: "min-h-[80px] px-3 py-2 text-xs",
         md: "min-h-[120px] px-4 py-3 text-sm",
         lg: "min-h-[200px] px-4 py-3 text-base",
       },

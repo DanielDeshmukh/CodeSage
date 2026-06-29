@@ -69,7 +69,7 @@ function AnalysisContent() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-on-dark">Analyzing Repository</h1>
+        <h1 className="text-3xl font-bold text-ink">Analyzing Repository</h1>
         <p className="mt-2 text-muted truncate">{repoUrl}</p>
       </div>
 
@@ -93,7 +93,7 @@ function AnalysisContent() {
                   <div
                     className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
                       isComplete
-                        ? "bg-success text-on-dark"
+                        ? "bg-success text-ink"
                         : isCurrent
                           ? "bg-primary text-ink"
                           : "bg-surface-elevated text-muted"
@@ -111,7 +111,7 @@ function AnalysisContent() {
                     <p
                       className={`font-medium ${
                         isCurrent
-                          ? "text-on-dark"
+                          ? "text-ink"
                           : isComplete
                             ? "text-success"
                             : "text-muted"
@@ -161,7 +161,7 @@ function AnalysisContent() {
             </div>
 
             <div className="mt-6">
-              <p className="text-sm font-medium text-on-dark">Languages Detected</p>
+              <p className="text-sm font-medium text-ink">Languages Detected</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {stats.languages.map((lang) => (
                   <span

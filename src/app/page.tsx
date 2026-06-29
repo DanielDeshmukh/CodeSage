@@ -93,7 +93,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-canvas-dark px-6 py-24 lg:py-32">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-on-dark sm:text-5xl lg:text-6xl">
+          <h1 className="text-4xl font-bold tracking-tight text-ink sm:text-5xl lg:text-6xl">
             Understand Your Code
             <span className="block text-primary">Deeply</span>
           </h1>
@@ -162,7 +162,7 @@ export default function LandingPage() {
       <section className="bg-canvas-dark px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-on-dark">How It Works</h2>
+            <h2 className="text-3xl font-bold text-ink">How It Works</h2>
             <p className="mt-3 text-muted">
               Powered by NVIDIA NIM for genuine code comprehension
             </p>
@@ -174,7 +174,7 @@ export default function LandingPage() {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     {feature.icon}
                   </div>
-                  <h3 className="text-lg font-semibold text-on-dark">
+                  <h3 className="text-lg font-semibold text-ink">
                     {feature.title}
                   </h3>
                   <p className="mt-2 text-sm text-muted">
@@ -190,7 +190,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="border-t border-hairline bg-surface px-6 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold text-on-dark">
+          <h2 className="text-3xl font-bold text-ink">
             Ready to Test Your Knowledge?
           </h2>
           <p className="mt-4 text-muted">

@@ -57,7 +57,7 @@ export function QuestionCard({ question, index, onAnswer }: QuestionCardProps) {
       <CardContent>
         {question.answer ? (
           <div className="rounded-lg bg-surface-elevated p-4">
-            <p className="text-sm text-on-dark">{question.answer.content}</p>
+            <p className="text-sm text-ink">{question.answer.content}</p>
             {question.answer.evaluation && (
               <div className="mt-4 grid grid-cols-3 gap-4">
                 <div>
@@ -84,7 +84,7 @@ export function QuestionCard({ question, index, onAnswer }: QuestionCardProps) {
         ) : (
           <div className="space-y-4">
             <textarea
-              className="w-full rounded-lg border border-hairline bg-surface p-4 text-sm text-on-dark placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-info focus:ring-offset-2 focus:ring-offset-canvas-dark min-h-[120px] resize-none"
+              className="w-full rounded-lg border border-hairline bg-surface p-4 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-info focus:ring-offset-2 focus:ring-offset-canvas-dark min-h-[120px] resize-none"
               placeholder="Type your answer here..."
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}

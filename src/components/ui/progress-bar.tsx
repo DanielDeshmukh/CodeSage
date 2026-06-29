@@ -6,19 +6,21 @@ interface ProgressBarProps extends HTMLAttributes<HTMLDivElement> {
   max?: number;
   size?: "sm" | "md" | "lg";
   showLabel?: boolean;
-  color?: "primary" | "success" | "danger";
+  color?: "primary" | "success" | "danger" | "waypoint" | "terraform";
 }
 
 const sizeClasses = {
   sm: "h-1",
-  md: "h-2",
-  lg: "h-3",
+  md: "h-1.5",
+  lg: "h-2",
 };
 
 const colorClasses = {
-  primary: "bg-primary",
+  primary: "bg-white",
   success: "bg-success",
   danger: "bg-danger",
+  waypoint: "bg-waypoint",
+  terraform: "bg-terraform",
 };
 
 const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
@@ -39,16 +41,16 @@ const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
     const getBarColor = (pct: number) => {
       if (color !== "primary") return colorClasses[color];
       if (pct >= 80) return "bg-success";
-      if (pct >= 50) return "bg-primary";
+      if (pct >= 50) return "bg-white";
       return "bg-danger";
     };
 
     return (
       <div className={cn("w-full", className)} ref={ref} {...props}>
         {showLabel && (
-          <div className="mb-1 flex items-center justify-between">
+          <div className="mb-1.5 flex items-center justify-between">
             <span className="text-xs text-muted">Progress</span>
-            <span className="text-xs font-medium text-on-dark">
+            <span className="text-xs font-medium text-ink">
               {Math.round(percentage)}%
             </span>
           </div>

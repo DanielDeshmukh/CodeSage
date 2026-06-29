@@ -19,10 +19,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-hairline bg-canvas-dark/95 backdrop-blur supports-[backdrop-filter]:bg-canvas-dark/60">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary">CodeSage</span>
+            <span className="text-lg font-bold text-ink">CodeSage</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
@@ -30,9 +30,9 @@ export function Header() {
                 key={item.href}
                 href={session ? item.href : "/login"}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-on-dark",
+                  "text-sm font-medium transition-colors hover:text-ink",
                   pathname === item.href
-                    ? "text-on-dark"
+                    ? "text-ink"
                     : "text-muted"
                 )}
               >
@@ -41,7 +41,7 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {session ? (
             <>
               <Link href="/settings">
@@ -54,12 +54,12 @@ export function Header() {
                   Add Repository
                 </Button>
               </Link>
-              <div className="flex items-center gap-3 pl-4 border-l border-hairline">
+              <div className="flex items-center gap-3 pl-3 border-l border-hairline">
                 {session.user?.image && (
                   <img
                     src={session.user.image}
                     alt=""
-                    className="h-8 w-8 rounded-full"
+                    className="h-7 w-7 rounded-full"
                   />
                 )}
                 <span className="text-sm text-muted hidden sm:inline">

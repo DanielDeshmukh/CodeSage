@@ -32,7 +32,7 @@ describe("Button", () => {
 
   it("should apply variant classes", () => {
     const { rerender } = render(<Button variant="primary">Test</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-primary");
+    expect(screen.getByRole("button").className).toContain("bg-white");
 
     rerender(<Button variant="danger">Test</Button>);
     expect(screen.getByRole("button").className).toContain("bg-danger");

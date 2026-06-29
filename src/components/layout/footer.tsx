@@ -60,7 +60,7 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-12 border-t border-hairline-on-light pt-8">
+        <div className="mt-12 border-t border-hairline pt-8">
           <p className="text-xs text-muted">
             &copy; {new Date().getFullYear()} CodeSage. All rights reserved.
           </p>

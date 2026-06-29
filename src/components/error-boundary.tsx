@@ -49,7 +49,7 @@ export class ErrorBoundary extends React.Component<
         <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
           <div className="w-full max-w-md rounded-lg border border-hairline bg-surface p-6 text-center">
             <div className="mb-4 text-4xl">⚠️</div>
-            <h2 className="mb-2 text-lg font-semibold text-on-dark">
+            <h2 className="mb-2 text-lg font-semibold text-ink">
               Something went wrong
             </h2>
             <p className="mb-4 text-sm text-muted">

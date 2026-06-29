@@ -1,27 +1,27 @@
 import { HTMLAttributes, forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-const typographyVariants = cva("text-body", {
+const typographyVariants = cva("text-ink", {
   variants: {
     variant: {
-      h1: "text-5xl font-bold tracking-tight text-on-dark leading-tight",
-      h2: "text-4xl font-bold tracking-tight text-on-dark leading-tight",
-      h3: "text-3xl font-semibold tracking-tight text-on-dark",
-      h4: "text-2xl font-semibold text-on-dark",
-      h5: "text-xl font-semibold text-on-dark",
-      h6: "text-lg font-semibold text-on-dark",
-      "display-lg": "text-5xl font-bold tracking-tight text-on-dark leading-none",
-      "display-md": "text-4xl font-semibold tracking-tight text-on-dark leading-tight",
-      "display-sm": "text-3xl font-semibold text-on-dark leading-snug",
-      "number-display": "text-4xl font-bold text-primary leading-none tracking-tight",
-      "number-md": "text-base font-medium text-on-dark",
-      "number-sm": "text-sm font-medium text-on-dark",
-      body: "text-sm text-body leading-relaxed",
-      "body-sm": "text-xs text-body leading-relaxed",
+      h1: "text-5xl font-bold tracking-tight leading-tight",
+      h2: "text-4xl font-bold tracking-tight leading-tight",
+      h3: "text-3xl font-semibold tracking-tight",
+      h4: "text-2xl font-semibold",
+      h5: "text-xl font-semibold",
+      h6: "text-lg font-semibold",
+      "display-lg": "text-5xl font-bold tracking-tight leading-none",
+      "display-md": "text-4xl font-semibold tracking-tight leading-tight",
+      "display-sm": "text-3xl font-semibold leading-snug",
+      "number-display": "text-4xl font-bold leading-none tracking-tight font-mono",
+      "number-md": "text-base font-medium",
+      "number-sm": "text-sm font-medium",
+      body: "text-sm text-ink leading-relaxed",
+      "body-sm": "text-xs text-ink leading-relaxed",
       caption: "text-xs font-medium text-muted leading-snug",
       muted: "text-sm text-muted",
       "muted-sm": "text-xs text-muted",
-      link: "text-sm font-medium text-primary hover:text-primary-active transition-colors",
+      link: "text-sm font-medium text-accent-blue hover:text-white transition-colors",
     },
     font: {
       sans: "font-sans",

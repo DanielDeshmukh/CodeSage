@@ -37,16 +37,16 @@ const ScoreGauge = forwardRef<HTMLDivElement, ScoreGaugeProps>(
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
     const getColor = (pct: number) => {
-      if (pct >= 80) return "#0ecb81"; // success green
-      if (pct >= 60) return "#fcd535"; // primary gold
-      if (pct >= 40) return "#3b82f6"; // info blue
-      return "#f6465d"; // danger red
+      if (pct >= 80) return "#00ca8e";
+      if (pct >= 60) return "#ffcf25";
+      if (pct >= 40) return "#2b89ff";
+      return "#e62b1e";
     };
 
     const getTextColor = (pct: number) => {
       if (pct >= 80) return "text-success";
-      if (pct >= 60) return "text-primary";
-      if (pct >= 40) return "text-info";
+      if (pct >= 60) return "text-vault";
+      if (pct >= 40) return "text-accent-blue";
       return "text-danger";
     };
 
@@ -61,16 +61,14 @@ const ScoreGauge = forwardRef<HTMLDivElement, ScoreGaugeProps>(
             className="h-full w-full -rotate-90"
             viewBox={`0 0 ${width} ${width}`}
           >
-            {/* Background circle */}
             <circle
               cx={width / 2}
               cy={width / 2}
               r={radius}
               fill="none"
-              stroke="#2b3139"
+              stroke="#3b3d45"
               strokeWidth={strokeWidth}
             />
-            {/* Progress circle */}
             <circle
               cx={width / 2}
               cy={width / 2}
@@ -84,7 +82,6 @@ const ScoreGauge = forwardRef<HTMLDivElement, ScoreGaugeProps>(
               className="transition-all duration-700 ease-out"
             />
           </svg>
-          {/* Score text */}
           <div className="absolute inset-0 flex items-center justify-center">
             <span
               className={cn("font-bold font-mono", fontSize, getTextColor(percentage))}

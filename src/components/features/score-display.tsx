@@ -27,7 +27,7 @@ function ScoreRing({ score, label, size = "lg" }: ScoreRingProps) {
 
   const getStrokeColor = (score: number) => {
     if (score >= 0.8) return "#0ecb81";
-    if (score >= 0.6) return "#fcd535";
+    if (score >= 0.6) return "#ffcf25";
     if (score >= 0.4) return "#3b82f6";
     return "#f6465d";
   };
@@ -44,7 +44,7 @@ function ScoreRing({ score, label, size = "lg" }: ScoreRingProps) {
             cy="50"
             r="40"
             fill="none"
-            stroke="#2b3139"
+            stroke="#3b3d45"
             strokeWidth="8"
           />
           <circle
