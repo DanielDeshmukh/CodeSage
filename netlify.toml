@@ -1,7 +1,6 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  functions = "netlify/functions"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -22,8 +21,3 @@
   for = "/api/*"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate"
-
-[[redirects]]
-  from = "/api/:path*"
-  to = "/.netlify/functions/:path*"
-  status = 200
