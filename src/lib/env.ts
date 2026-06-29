@@ -4,8 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     // NIM API Configuration
-    NIM_API_KEY: z.string().min(1, "NIM API key is required"),
-    NIM_BASE_URL: z.string().url("NIM base URL must be a valid URL"),
+    NIM_API_KEY: z.string().default(""),
+    NIM_BASE_URL: z.string().url("NIM base URL must be a valid URL").default("https://integrate.api.nvidia.com/v1"),
 
     // Model Endpoints
     NIM_EMBED_MODEL: z.string().default("nvidia/llama-nemotron-embed-1b-v2"),
