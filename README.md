@@ -2,7 +2,6 @@
   <img src="banner.png" alt="CodeSage Banner" width="100%" />
 </p>
 
-<h1 align="center">CodeSage</h1>
 
 <p align="center">
   <strong>AI-Powered Codebase Examiner for Viva & Interview Preparation</strong>
