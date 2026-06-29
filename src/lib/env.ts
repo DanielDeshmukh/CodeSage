@@ -17,6 +17,7 @@ export const env = createEnv({
     // Qdrant Configuration
     QDRANT_URL: z.string().url("Qdrant URL must be a valid URL").default("http://localhost:6333"),
     QDRANT_API_KEY: z.string().optional(),
+    QDRANT_COLLECTION: z.string().default("codesage"),
 
     // GitHub Configuration
     GITHUB_TOKEN: z.string().optional(),
@@ -42,6 +43,7 @@ export const env = createEnv({
     NIM_SAFETY_MODEL: process.env.NIM_SAFETY_MODEL,
     QDRANT_URL: process.env.QDRANT_URL,
     QDRANT_API_KEY: process.env.QDRANT_API_KEY,
+    QDRANT_COLLECTION: process.env.QDRANT_COLLECTION,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
