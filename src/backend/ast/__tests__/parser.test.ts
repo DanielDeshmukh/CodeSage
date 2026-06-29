@@ -53,7 +53,7 @@ describe("AST Parser", () => {
         `;
         const chunks = parseFile(code, "test.ts", "typescript");
 
-        expect(chunks[0].calls).toContain("console");
+        expect(chunks[0].calls).toContain("log");
         expect(chunks[0].calls).toContain("fetch");
       });
 

@@ -31,15 +31,28 @@ describe("SafetyService", () => {
     });
 
     it("should return unsafe for harmful content", async () => {
-      const mockResponse = {
+      const safetyPayload = {
         is_safe: false,
         safety_rating: "unsafe",
         flagged_categories: ["harmful"],
       };
 
+      const chatResponse = {
+        id: "test-id",
+        choices: [
+          {
+            index: 0,
+            message: { role: "assistant", content: JSON.stringify(safetyPayload) },
+            finish_reason: "stop",
+          },
+        ],
+        model: "test-model",
+        usage: { prompt_tokens: 5, completion_tokens: 5, total_tokens: 10 },
+      };
+
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(mockResponse),
+        json: () => Promise.resolve(chatResponse),
       });
 
       const result = await service.checkContent({

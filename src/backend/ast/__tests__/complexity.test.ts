@@ -84,22 +84,28 @@ describe("ComplexityScorer", () => {
       const chunk = createChunk(`
         function complex(a, b, c) {
           if (a > 0) {
-            for (let i = 0; i < a; i++) {
-              if (b > 0) {
-                while (c > 0) {
-                  switch (c) {
-                    case 1:
-                      try {
-                        if (i > 0) {
-                          return 1;
-                        }
-                      } catch (e) {
-                        return 2;
+            if (b > 0) {
+              if (c > 0) {
+                for (let i = 0; i < a; i++) {
+                  if (i % 2 === 0) {
+                    while (b > 0) {
+                      switch (c) {
+                        case 1: return 1;
+                        case 2: return 2;
+                        case 3: return 3;
+                        case 4: return 4;
                       }
+                    }
                   }
                 }
+              } else {
+                return -1;
               }
+            } else {
+              return -2;
             }
+          } else {
+            return -3;
           }
           return 0;
         }
@@ -128,9 +134,9 @@ describe("ComplexityScorer", () => {
   describe("calculateBatch", () => {
     it("should process multiple chunks", () => {
       const chunks = [
-        createChunk("function a() {}"),
-        createChunk("function b() { if (x) {} }"),
-        createChunk("function c() { for (let i=0; i<10; i++) {} }"),
+        { ...createChunk("function a() {}"), id: "chunk-a" },
+        { ...createChunk("function b() { if (x) {} }"), id: "chunk-b" },
+        { ...createChunk("function c() { for (let i=0; i<10; i++) {} }"), id: "chunk-c" },
       ];
 
       const results = scorer.calculateBatch(chunks);
@@ -142,6 +148,7 @@ describe("ComplexityScorer", () => {
   describe("getRiskDescription", () => {
     it("should return descriptions for risk levels", () => {
       expect(scorer.getRiskDescription("low")).toContain("Simple");
+      expect(scorer.getRiskDescription("moderate")).toContain("Moderate");
       expect(scorer.getRiskDescription("high")).toContain("Complex");
       expect(scorer.getRiskDescription("critical")).toContain("Very complex");
     });
