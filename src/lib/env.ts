@@ -21,6 +21,8 @@ export const env = createEnv({
 
     // GitHub Configuration
     GITHUB_TOKEN: z.string().optional(),
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
 
     // Database
     DATABASE_URL: z.string().optional(),
@@ -45,6 +47,8 @@ export const env = createEnv({
     QDRANT_API_KEY: process.env.QDRANT_API_KEY,
     QDRANT_COLLECTION: process.env.QDRANT_COLLECTION,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
