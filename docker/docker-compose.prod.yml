@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # ─── Vector Database ───────────────────────────────────────────────
   qdrant:
@@ -19,9 +17,28 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ─── NIM Embedding Model ───────────────────────────────────────────
+  # ─── PostgreSQL ────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: codesage
+      POSTGRES_USER: codesage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codesage_dev}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codesage"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── NIM Embedding (nvidia/llama-nemotron-embed-1b-v2) ─────────────
+  # Requires: NVIDIA GPU with 4GB+ VRAM
   nim-embed:
-    image: nvcr.io/nim/nvidia/nv-embedqa-e5-v5:latest
+    image: nvcr.io/nim/nvidia/llama-nemotron-embed-1b-v2:latest
     ports:
       - "8080:8080"
     environment:
@@ -40,9 +57,10 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ─── NIM Reranking Model ───────────────────────────────────────────
+  # ─── NIM Reranking (nvidia/llama-nemotron-rerank-1b-v2) ───────────
+  # Requires: NVIDIA GPU with 4GB+ VRAM
   nim-rerank:
-    image: nvcr.io/nim/nvidia/nv-rerankqa-mistral-4b-v3:latest
+    image: nvcr.io/nim/nvidia/llama-nemotron-rerank-1b-v2:latest
     ports:
       - "8081:8080"
     environment:
@@ -61,7 +79,8 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ─── NIM Examiner (49B) ───────────────────────────────────────────
+  # ─── NIM Examiner — Super 49B (nvidia/llama-nemotron-super-49b-v1) ─
+  # Requires: NVIDIA GPU with 24GB+ VRAM (A100/H100 recommended)
   nim-examiner:
     image: nvcr.io/nim/nvidia/llama-nemotron-super-49b-v1:latest
     ports:
@@ -82,7 +101,8 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ─── NIM Safety Model ──────────────────────────────────────────────
+  # ─── NIM Safety (nvidia/nemotron-3.5-content-safety) ──────────────
+  # Requires: NVIDIA GPU with 8GB+ VRAM
   nim-safety:
     image: nvcr.io/nim/nvidia/nemotron-3.5-content-safety:latest
     ports:
@@ -103,22 +123,26 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ─── PostgreSQL ────────────────────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
+  # ─── NIM Scorer — Reward 340B (nvidia/nemotron-4-340b-reward) ─────
+  # Requires: NVIDIA GPU with 40GB+ VRAM (multi-GPU or H100 recommended)
+  nim-scorer:
+    image: nvcr.io/nim/nvidia/nemotron-4-340b-reward:latest
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - "8084:8080"
     environment:
-      POSTGRES_DB: codesage
-      POSTGRES_USER: codesage
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codesage_dev}
+      NVIDIA_API_KEY: ${NIM_API_KEY}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U codesage"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
 volumes:
