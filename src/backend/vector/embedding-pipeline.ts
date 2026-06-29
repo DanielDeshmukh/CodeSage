@@ -146,8 +146,8 @@ export class EmbeddingPipeline {
 
   async getRepositoryEmbeddingStats(repositoryId: string): Promise<{
     totalChunks: number;
-    avgVectorDim: number;
     languages: Record<string, number>;
+    types: Record<string, number>;
   }> {
     return this.qdrantClient.getRepositoryStats(repositoryId);
   }
