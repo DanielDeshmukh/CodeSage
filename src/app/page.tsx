@@ -203,7 +203,7 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/repositories">
-              <Button variant="secondary-dark" size="lg">
+              <Button variant="secondary" size="lg">
                 View Repositories
               </Button>
             </Link>

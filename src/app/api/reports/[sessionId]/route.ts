@@ -5,10 +5,10 @@ import { getStudyGuideGenerator } from "@/backend/reports/study-guide";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { sessionId } = params;
+    const { sessionId } = await params;
     const searchParams = request.nextUrl.searchParams;
     const includeStudyGuide = searchParams.get("studyGuide") === "true";
 

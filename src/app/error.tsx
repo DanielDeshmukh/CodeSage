@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export default function GlobalError({
   error,
@@ -52,12 +53,12 @@ export default function GlobalError({
               >
                 Try again
               </button>
-              <a
+              <Link
                 href="/"
                 className="rounded border border-hairline px-8 py-3 text-sm font-semibold text-muted hover:bg-surface-elevated transition-colors"
               >
                 Emergency exit
-              </a>
+              </Link>
             </div>
           </div>
         </div>

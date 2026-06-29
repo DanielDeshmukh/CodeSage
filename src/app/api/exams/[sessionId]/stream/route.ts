@@ -3,9 +3,9 @@ import { getExamLoop } from "@/backend/examination/exam-loop";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
-  const { sessionId } = params;
+  const { sessionId } = await params;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({

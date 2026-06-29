@@ -63,7 +63,7 @@ export function Header() {
                   />
                 )}
                 <span className="text-sm text-muted hidden sm:inline">
-                  {session.user?.name || session.user?.login}
+                  {session.user?.name || (session.user as any)?.login}
                 </span>
                 <Button
                   variant="ghost"
