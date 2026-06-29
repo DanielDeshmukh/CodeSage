@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "CodeSage - AI-Powered Codebase Examiner",
   description:
     "AI-powered codebase examiner for viva, project review, and interview preparation.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
