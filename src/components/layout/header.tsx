@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +15,7 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-hairline bg-canvas-dark/95 backdrop-blur supports-[backdrop-filter]:bg-canvas-dark/60">
@@ -26,7 +28,7 @@ export function Header() {
             {navItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                href={session ? item.href : "/login"}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-on-dark",
                   pathname === item.href
@@ -40,16 +42,52 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/settings">
-            <Button variant="ghost" size="sm">
-              Settings
-            </Button>
-          </Link>
-          <Link href="/repositories/submit">
-            <Button variant="primary" size="sm">
-              Add Repository
-            </Button>
-          </Link>
+          {session ? (
+            <>
+              <Link href="/settings">
+                <Button variant="ghost" size="sm">
+                  Settings
+                </Button>
+              </Link>
+              <Link href="/repositories/submit">
+                <Button variant="primary" size="sm">
+                  Add Repository
+                </Button>
+              </Link>
+              <div className="flex items-center gap-3 pl-4 border-l border-hairline">
+                {session.user?.image && (
+                  <img
+                    src={session.user.image}
+                    alt=""
+                    className="h-8 w-8 rounded-full"
+                  />
+                )}
+                <span className="text-sm text-muted hidden sm:inline">
+                  {session.user?.name || session.user?.login}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  Sign out
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  Sign in
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button variant="primary" size="sm">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
