@@ -3,10 +3,10 @@ import { render, screen } from "@testing-library/react";
 import { ProgressBar } from "../ui/progress-bar";
 
 describe("ProgressBar", () => {
-  it("should render with percentage", () => {
-    render(<ProgressBar value={50} />);
-    const bar = screen.getByRole("progressbar", { hidden: true }) || document.querySelector('[style*="width"]');
-    expect(bar).toBeTruthy();
+  it("should render with correct width", () => {
+    const { container } = render(<ProgressBar value={50} />);
+    const fillBar = container.querySelector('[style*="width: 50%"]');
+    expect(fillBar).toBeInTheDocument();
   });
 
   it("should show label when showLabel is true", () => {
