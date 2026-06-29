@@ -201,21 +201,26 @@ CodeSage/
 
 ## Deployment
 
-### Vercel (Recommended)
+### Netlify (Recommended)
 
 1. Push to GitHub repository
-2. Import project in [Vercel Dashboard](https://vercel.com/)
-3. Configure environment variables
-4. Deploy
+2. Import project in [Netlify Dashboard](https://app.netlify.com/)
+3. Build settings are pre-configured via `netlify.toml`
+4. Configure environment variables in Netlify dashboard
+5. Deploy
 
-### Docker
+### Self-Hosted with Docker
 
 ```bash
-docker build -t codesage .
-docker run -p 3000:3000 codesage
+# Start all services (Qdrant + PostgreSQL + NIM containers)
+docker compose -f docker/docker-compose.prod.yml up -d
+
+# Start the app
+npm run build
+npm run start
 ```
 
-### Self-Hosted
+### Self-Hosted without Docker
 
 ```bash
 npm run build
@@ -229,8 +234,14 @@ npm run start
 | `NIM_API_KEY` | Yes | - | NVIDIA NIM API key |
 | `GITHUB_TOKEN` | No | - | GitHub API token |
 | `QDRANT_URL` | No | `http://localhost:6333` | Qdrant instance URL |
-| `NIM_MODEL_EXAMINER` | No | `Llama-3.3-70B-Instruct` | Examiner model |
-| `NIM_MODEL_SCORER` | No | `Llama-Nemotron-70B-Reward` | Scorer model |
+| `QDRANT_API_KEY` | No | - | Qdrant Cloud API key |
+| `QDRANT_COLLECTION` | No | `codesage` | Qdrant collection name |
+| `DATABASE_URL` | No | - | PostgreSQL connection string |
+| `NIM_EMBED_MODEL` | No | `nvidia/llama-nemotron-embed-1b-v2` | Embedding model |
+| `NIM_RERANK_MODEL` | No | `nvidia/llama-nemotron-rerank-1b-v2` | Reranking model |
+| `NIM_EXAMINER_MODEL` | No | `nvidia/llama-nemotron-super-49b-v1` | Examiner model |
+| `NIM_SCORER_MODEL` | No | `nvidia/nemotron-4-340b-reward` | Scorer model |
+| `NIM_SAFETY_MODEL` | No | `nvidia/nemotron-3.5-content-safety` | Safety model |
 
 ## Contributing
 
@@ -247,9 +258,45 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [NVIDIA NIM](https://build.nvidia.com/) for AI model inference
-- [Vercel](https://vercel.com/) for Next.js framework
+- [Netlify](https://www.netlify.com/) for deployment
 - [Qdrant](https://qdrant.tech/) for vector database
 - [Tree-sitter](https://tree-sitter.github.io/) for AST parsing
+
+## NIM Setup Guide
+
+### Cloud API (Quickest)
+
+1. Go to [build.nvidia.com](https://build.nvidia.com/)
+2. Sign up / log in
+3. Navigate to any model page (e.g., [NV-Embed-QA](https://build.nvidia.com/nvidia/nv-embedqa-e5-v5))
+4. Click "Get API Key" → Generate
+5. Copy the key and set as `NIM_API_KEY` in `.env.local`
+
+### Self-Hosted Docker (Production)
+
+Requires NVIDIA GPU with 16GB+ VRAM per model.
+
+```bash
+# Login to NVIDIA container registry
+docker login nvcr.io
+
+# Start all services
+docker compose -f docker/docker-compose.prod.yml up -d
+
+# Check health
+docker compose -f docker/docker-compose.prod.yml ps
+```
+
+### Model Endpoints
+
+| Service | Port | Endpoint |
+|---------|------|----------|
+| Embedding | 8080 | `http://localhost:8080/v1/embeddings` |
+| Reranking | 8081 | `http://localhost:8081/v1/ranking` |
+| Examiner | 8082 | `http://localhost:8082/v1/chat/completions` |
+| Safety | 8083 | `http://localhost:8083/v1/chat/completions` |
+| Qdrant | 6333 | `http://localhost:6333` |
+| PostgreSQL | 5432 | `localhost:5432` |
 
 ---
 
