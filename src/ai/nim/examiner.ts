@@ -122,7 +122,7 @@ export class ExaminerService {
   }
 
   private buildQuestionPrompt(request: QuestionRequest): string {
-    const { context, mode, difficulty, previousQuestions, questionCount = 5 } = request;
+    const { context, mode, difficulty, questionCount = 5 } = request;
 
     let modeInstruction = "";
     switch (mode) {

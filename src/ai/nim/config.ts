@@ -2,10 +2,13 @@ export interface NIMModelConfig {
   id: string;
   name: string;
   endpoint: string;
-  maxTokens: number;
-  temperature: number;
-  topP: number;
+  maxTokens?: number;
+  temperature?: number;
+  topP?: number;
   description: string;
+  dimensions?: number;
+  maxBatchSize?: number;
+  maxDocuments?: number;
 }
 
 export const NIM_MODELS = {

@@ -1,4 +1,4 @@
-import { getNIMClient, type NIMEmbeddingResponse } from "./client";
+import { getNIMClient } from "./client";
 import { NIM_MODELS } from "./config";
 
 export interface EmbeddingOptions {

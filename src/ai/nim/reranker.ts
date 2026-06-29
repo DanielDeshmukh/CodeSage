@@ -1,4 +1,4 @@
-import { getNIMClient, type NIMRerankResponse } from "./client";
+import { getNIMClient } from "./client";
 import { NIM_MODELS } from "./config";
 
 export interface RerankResult {
