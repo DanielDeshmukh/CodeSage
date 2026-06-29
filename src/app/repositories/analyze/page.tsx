@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ const steps: { key: AnalysisStep; label: string }[] = [
   { key: "indexing", label: "Indexing to Vector Store" },
 ];
 
-export default function RepositoryAnalysisPage() {
+function AnalysisContent() {
   const searchParams = useSearchParams();
   const repoUrl = searchParams.get("url") || "";
 
@@ -186,5 +186,13 @@ export default function RepositoryAnalysisPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function RepositoryAnalysisPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-4xl px-6 py-12 text-muted">Loading analysis...</div>}>
+      <AnalysisContent />
+    </Suspense>
   );
 }
