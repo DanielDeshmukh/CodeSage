@@ -17,9 +17,59 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeSage - AI-Powered Codebase Examiner",
+  title: {
+    default: "CodeSage - AI-Powered Codebase Examiner",
+    template: "%s | CodeSage",
+  },
   description:
-    "AI-powered codebase examiner for viva, project review, and interview preparation.",
+    "AI-powered codebase examiner for viva, project review, and interview preparation. Powered by NVIDIA NIM 5-model stack.",
+  keywords: [
+    "code review",
+    "interview preparation",
+    "viva voce",
+    "codebase analysis",
+    "AI examiner",
+    "NVIDIA NIM",
+    "code quality",
+    "developer assessment",
+  ],
+  authors: [{ name: "CodeSage" }],
+  creator: "CodeSage",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://codesage.dev",
+    siteName: "CodeSage",
+    title: "CodeSage - AI-Powered Codebase Examiner",
+    description:
+      "AI-powered codebase examiner for viva, project review, and interview preparation.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "CodeSage - AI-Powered Codebase Examiner",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CodeSage - AI-Powered Codebase Examiner",
+    description:
+      "AI-powered codebase examiner for viva, project review, and interview preparation.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: "/favicon.ico",
   },
