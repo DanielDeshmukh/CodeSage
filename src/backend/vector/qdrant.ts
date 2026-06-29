@@ -241,6 +241,56 @@ export class QdrantClient {
       }),
     });
   }
+
+  // --------------------------------------------------------------------------
+  // Statistics
+  // --------------------------------------------------------------------------
+
+  async getCollectionInfo(): Promise<{
+    pointsCount: number;
+    vectorsSize: number;
+    status: string;
+  }> {
+    const response = await fetch(
+      `${this.baseUrl}/collections/${this.collectionName}`,
+      { headers: this.getHeaders() }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to get collection info: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return {
+      pointsCount: data.result.points_count || 0,
+      vectorsSize: data.result.config?.params?.vectors?.size || 768,
+      status: data.result.status || "unknown",
+    };
+  }
+
+  async getRepositoryStats(repositoryId: string): Promise<{
+    totalChunks: number;
+    languages: Record<string, number>;
+    types: Record<string, number>;
+  }> {
+    const points = await this.scrollByRepository(repositoryId, 10000);
+
+    const languages: Record<string, number> = {};
+    const types: Record<string, number> = {};
+
+    for (const point of points) {
+      const lang = point.payload.language;
+      const type = point.payload.type;
+      languages[lang] = (languages[lang] || 0) + 1;
+      types[type] = (types[type] || 0) + 1;
+    }
+
+    return {
+      totalChunks: points.length,
+      languages,
+      types,
+    };
+  }
 }
 
 // Singleton instance
