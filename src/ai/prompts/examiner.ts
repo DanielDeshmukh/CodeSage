@@ -1,7 +1,8 @@
 import type { ExamMode, Difficulty } from "@/backend/examination/session";
 
 export interface PromptContext {
-  repositoryName: string;
+  repositoryId?: string;
+  repositoryName?: string;
   language: string;
   filePath: string;
   chunkName: string;
