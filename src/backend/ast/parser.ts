@@ -158,6 +158,96 @@ function parseTypeScript(content: string, _filePath: string): ParsedChunk[] {
   return chunks;
 }
 
+function parseJava(content: string, _filePath: string): ParsedChunk[] {
+  const chunks: ParsedChunk[] = [];
+  const lines = content.split("\n");
+
+  let currentChunk: Partial<ParsedChunk> | null = null;
+  let braceCount = 0;
+  let startLine = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Detect method declarations
+    const methodMatch = trimmed.match(
+      /^(?:public|private|protected|static|final|abstract|synchronized|native)\s+.*?\s+(\w+)\s*\(/
+    );
+    if (methodMatch && !currentChunk) {
+      currentChunk = {
+        type: "function",
+        name: methodMatch[1],
+        startLine: i + 1,
+        calls: [],
+        complexity: 1,
+        hasTodos: false,
+        dependencyCount: 0,
+      };
+      startLine = i;
+      braceCount = 0;
+    }
+
+    // Detect class declarations
+    const classMatch = trimmed.match(
+      /^(?:public|private|protected)?\s*(?:abstract|final)?\s*class\s+(\w+)/
+    );
+    if (classMatch && !currentChunk) {
+      currentChunk = {
+        type: "class",
+        name: classMatch[1],
+        startLine: i + 1,
+        calls: [],
+        complexity: 1,
+        hasTodos: false,
+        dependencyCount: 0,
+      };
+      startLine = i;
+      braceCount = 0;
+    }
+
+    if (currentChunk) {
+      for (const char of line) {
+        if (char === "{") braceCount++;
+        if (char === "}") braceCount--;
+      }
+
+      if (trimmed.includes("TODO") || trimmed.includes("FIXME")) {
+        currentChunk.hasTodos = true;
+      }
+
+      const callMatches = trimmed.matchAll(/(\w+)\s*\(/g);
+      for (const match of callMatches) {
+        if (!["if", "for", "while", "switch", "catch", "return"].includes(match[1])) {
+          currentChunk.calls?.push(match[1]);
+        }
+      }
+
+      if (["if", "else", "for", "while", "switch", "case", "catch", "try"].some(kw => trimmed.startsWith(kw))) {
+        currentChunk.complexity = (currentChunk.complexity || 1) + 1;
+      }
+
+      if (braceCount === 0 && currentChunk.name) {
+        chunks.push({
+          type: currentChunk.type as ParsedChunk["type"],
+          name: currentChunk.name,
+          content: lines.slice(startLine, i + 1).join("\n"),
+          startLine: currentChunk.startLine || 1,
+          endLine: i + 1,
+          language: "java",
+          calls: currentChunk.calls || [],
+          complexity: currentChunk.complexity || 1,
+          hasTodos: currentChunk.hasTodos || false,
+          dependencyCount: currentChunk.dependencyCount || 0,
+        });
+        currentChunk = null;
+      }
+    }
+  }
+
+  return chunks;
+}
+
 function parsePython(content: string, _filePath: string): ParsedChunk[] {
   const chunks: ParsedChunk[] = [];
   const lines = content.split("\n");
@@ -293,6 +383,8 @@ export function parseFile(
       return parseTypeScript(content, filePath);
     case "python":
       return parsePython(content, filePath);
+    case "java":
+      return parseJava(content, filePath);
     default:
       // For unsupported languages, return the whole file as a single chunk
       return [
