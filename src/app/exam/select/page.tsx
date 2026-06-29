@@ -66,11 +66,11 @@ const examModes = [
   },
 ];
 
-const difficultyColors = {
+const difficultyColors: Record<string, "success" | "primary" | "info"> = {
   Intermediate: "success",
   Advanced: "primary",
   "All Levels": "info",
-} as const;
+};
 
 export default function ExamModeSelectionPage() {
   const router = useRouter();

@@ -52,11 +52,11 @@ const mockSessions = [
   },
 ];
 
-const modeColors = {
+const modeColors: Record<string, "primary" | "success" | "info"> = {
   viva: "primary",
   interview: "success",
   "code-review": "info",
-} as const;
+};
 
 export default function ExamHistoryPage() {
   return (
