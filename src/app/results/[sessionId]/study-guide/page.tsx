@@ -44,11 +44,11 @@ const mockStudyGuide = [
   },
 ];
 
-const severityColors = {
+const severityColors: Record<string, "danger" | "warning" | "info"> = {
   high: "danger",
   medium: "warning",
   low: "info",
-} as const;
+};
 
 export default function StudyGuidePage() {
   return (
