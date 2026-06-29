@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function GlobalError({
   error,
   reset,
@@ -11,25 +13,52 @@ export default function GlobalError({
     <html lang="en">
       <body className="min-h-screen bg-canvas-dark text-on-dark">
         <div className="flex min-h-screen flex-col items-center justify-center p-8">
-          <div className="w-full max-w-md rounded-lg border border-hairline bg-surface p-8 text-center">
-            <div className="mb-6 text-6xl font-bold text-danger">!</div>
-            <h1 className="mb-2 text-xl font-semibold text-on-dark">
-              Application Error
+          <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-10 text-center">
+            <div className="mx-auto mb-6 h-48 w-48 relative">
+              <Image
+                src="/error-logo.png"
+                alt="Sage looking confused and worried"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+
+            <div className="mb-4 text-7xl font-bold text-danger">500</div>
+
+            <h1 className="mb-3 text-2xl font-bold text-on-dark">
+              Well, this is embarrassing...
             </h1>
-            <p className="mb-4 text-sm text-muted">
-              {error.message || "An unexpected error occurred"}
+
+            <p className="mb-2 text-sm text-muted">
+              Our Sage tried to compute something and his brain just... stopped.
             </p>
+
+            <p className="mb-4 text-xs text-muted/60">
+              {error.message ||
+                "Something went wrong on our end. The code monkeys are on it."}
+            </p>
+
             {error.digest && (
-              <p className="mb-4 text-xs text-muted">
+              <p className="mb-6 rounded bg-surface-elevated px-3 py-1.5 text-xs text-muted/50">
                 Error ID: {error.digest}
               </p>
             )}
-            <button
-              onClick={reset}
-              className="rounded bg-primary px-6 py-2 text-sm font-semibold text-ink hover:bg-primary-active"
-            >
-              Try again
-            </button>
+
+            <div className="flex items-center justify-center gap-4">
+              <button
+                onClick={reset}
+                className="rounded bg-primary px-8 py-3 text-sm font-semibold text-ink hover:bg-primary-active transition-colors"
+              >
+                Try again
+              </button>
+              <a
+                href="/"
+                className="rounded border border-hairline px-8 py-3 text-sm font-semibold text-muted hover:bg-surface-elevated transition-colors"
+              >
+                Emergency exit
+              </a>
+            </div>
           </div>
         </div>
       </body>
