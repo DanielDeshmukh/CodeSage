@@ -48,7 +48,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ repositoryId }: SidebarProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
 
   return (
     <aside className="hidden w-64 border-r border-hairline bg-surface lg:block">

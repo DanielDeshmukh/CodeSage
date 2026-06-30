@@ -8,8 +8,8 @@ import Link from "next/link";
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const error = searchParams.get("error");
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const error = searchParams?.get("error") ?? null;
+  const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas-dark p-8">

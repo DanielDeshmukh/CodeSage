@@ -18,7 +18,7 @@ const steps: { key: AnalysisStep; label: string }[] = [
 
 function AnalysisContent() {
   const searchParams = useSearchParams();
-  const repoUrl = searchParams.get("url") || "";
+  const repoUrl = searchParams?.get("url") || "";
 
   const [currentStep, setCurrentStep] = useState<AnalysisStep>("cloning");
   const [progress, setProgress] = useState(0);
