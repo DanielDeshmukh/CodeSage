@@ -117,11 +117,22 @@ body {
 .dot-grid {
   position: absolute;
   inset: 0;
-  z-index: -1;
   background-image: radial-gradient(circle, var(--color-hairline) 0.8px, transparent 0.8px);
   background-size: 28px 28px;
   pointer-events: none;
   opacity: 0.6;
+  z-index: 0;
+}
+
+.dot-grid-on::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--color-hairline) 0.8px, transparent 0.8px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: 0;
 }
 
 .dot-grid-subtle {
