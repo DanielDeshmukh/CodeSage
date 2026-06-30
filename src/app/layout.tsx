@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
-import { Sidebar } from "@/components/layout/sidebar";
+import { LayoutContent } from "@/components/layout/layout-content";
 import { Footer } from "@/components/layout/footer";
 import { PerformanceMonitor } from "@/components/performance-monitor";
 
@@ -90,10 +90,7 @@ export default function RootLayout({
         <Providers>
           <PerformanceMonitor />
           <Header />
-          <div className="flex flex-1 pt-[60px]">
-            <Sidebar />
-            <main className="flex-1 overflow-auto">{children}</main>
-          </div>
+          <LayoutContent>{children}</LayoutContent>
           <Footer />
         </Providers>
       </body>

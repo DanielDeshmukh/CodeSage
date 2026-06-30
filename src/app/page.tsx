@@ -125,7 +125,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* ── HERO ── */}
-      <section className="section-page relative flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-12 pt-[120px] pb-20">
+      <section className="section-page relative isolate flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-12 pt-[120px] pb-20">
         <div className="dot-grid" />
         <div className="hero-glow" />
         <div className="relative z-[1] flex flex-col items-center">
@@ -401,7 +401,7 @@ export default function LandingPage() {
       <hr className="divider" />
 
       {/* ── CTA ── */}
-      <section className="cta-section">
+      <section className="cta-section isolate">
         <div className="dot-grid dot-grid-subtle" />
         <div className="cta-glow" />
         <div className="relative z-[1]">
