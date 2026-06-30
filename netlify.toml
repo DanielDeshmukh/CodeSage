@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  NODE_ENV = "production"
+
 [functions]
   node_bundler = "esbuild"
   included_files = []
