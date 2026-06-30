@@ -128,6 +128,7 @@ export default function LandingPage() {
       <section className="section-page relative flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-12 pt-[120px] pb-20">
         <div className="dot-grid" />
         <div className="hero-glow" />
+        <div className="relative z-[1] flex flex-col items-center">
 
         <div className="hero-badge">
           <span className="badge-dot" />
@@ -179,6 +180,7 @@ export default function LandingPage() {
             <span className="t-line"><span className="t-output">   </span><span className="t-blue">WebSocket</span><span className="t-output"> handler skips it. Was this intentional? What</span></span>
             <span className="t-line"><span className="t-output">   are the implications for session hijacking? </span><span className="t-cursor" /></span>
           </div>
+        </div>
         </div>
       </section>
 
@@ -402,6 +404,7 @@ export default function LandingPage() {
       <section className="cta-section">
         <div className="dot-grid dot-grid-subtle" />
         <div className="cta-glow" />
+        <div className="relative z-[1]">
         <h2 className="cta-title">Know your<br /><span className="text-primary">own code.</span></h2>
         <p className="cta-sub">Connect your repository and start your first viva session in under a minute.</p>
         <div className="cta-actions">
@@ -417,6 +420,7 @@ export default function LandingPage() {
               View on GitHub
             </Button>
           </a>
+        </div>
         </div>
       </section>
     </div>

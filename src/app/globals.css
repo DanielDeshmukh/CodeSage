@@ -117,13 +117,15 @@ body {
 .dot-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, var(--color-hairline) 1px, transparent 1px);
+  z-index: 0;
+  background-image: radial-gradient(circle, var(--color-hairline) 0.8px, transparent 0.8px);
   background-size: 28px 28px;
   pointer-events: none;
+  opacity: 0.6;
 }
 
 .dot-grid-subtle {
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
 .divider {
