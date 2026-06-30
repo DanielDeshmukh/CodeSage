@@ -2,6 +2,9 @@
   command = "NODE_ENV=production npm run build"
   publish = ".next"
 
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "NIM_RERANK_MODEL,NIM_EMBED_MODEL,NIM_EXAMINER_MODEL,NIM_SCORER_MODEL,NIM_SAFETY_MODEL,NIM_BASE_URL,QDRANT_COLLECTION,NEXT_PUBLIC_APP_URL,NODE_ENV"
+
 [functions]
   node_bundler = "esbuild"
   included_files = []
