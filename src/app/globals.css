@@ -117,22 +117,9 @@ body {
 .dot-grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, var(--color-hairline) 0.8px, transparent 0.8px);
+  background-image: radial-gradient(circle, rgba(125,138,150,0.5) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
-  opacity: 0.6;
-  z-index: 0;
-}
-
-.dot-grid-on::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, var(--color-hairline) 0.8px, transparent 0.8px);
-  background-size: 28px 28px;
-  pointer-events: none;
-  opacity: 0.6;
-  z-index: 0;
 }
 
 .dot-grid-subtle {
@@ -219,8 +206,15 @@ body {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
 }
 
 /* Terminal card */
@@ -248,9 +242,18 @@ body {
   height: 10px;
   border-radius: 50%;
 }
-.tbar-dot.r { background: #e62b1e; }
-.tbar-dot.y { background: #ffcf25; }
-.tbar-dot.g { background: #00ca8e; }
+
+.tbar-dot.r {
+  background: #e62b1e;
+}
+
+.tbar-dot.y {
+  background: #ffcf25;
+}
+
+.tbar-dot.g {
+  background: #00ca8e;
+}
 
 .tbar-title {
   margin-left: auto;
@@ -268,14 +271,38 @@ body {
   line-height: 1.8;
 }
 
-.t-line { display: block; }
-.t-prompt { color: var(--color-muted); }
-.t-cmd { color: var(--color-primary); }
-.t-comment { color: var(--color-hairline); }
-.t-output { color: var(--color-muted); }
-.t-success { color: var(--color-success); }
-.t-warn { color: var(--color-gold-light); }
-.t-blue { color: var(--color-primary); }
+.t-line {
+  display: block;
+}
+
+.t-prompt {
+  color: var(--color-muted);
+}
+
+.t-cmd {
+  color: var(--color-primary);
+}
+
+.t-comment {
+  color: var(--color-hairline);
+}
+
+.t-output {
+  color: var(--color-muted);
+}
+
+.t-success {
+  color: var(--color-success);
+}
+
+.t-warn {
+  color: var(--color-gold-light);
+}
+
+.t-blue {
+  color: var(--color-primary);
+}
+
 .t-cursor {
   display: inline-block;
   width: 7px;
@@ -284,7 +311,18 @@ body {
   vertical-align: text-bottom;
   animation: blink 1.1s step-end infinite;
 }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
 
 /* Mode cards grid */
 .mode-grid {
@@ -304,7 +342,10 @@ body {
   position: relative;
   transition: background 0.2s;
 }
-.mode-card:hover { background: #0f1117; }
+
+.mode-card:hover {
+  background: #0f1117;
+}
 
 .mode-icon {
   width: 40px;
@@ -354,7 +395,10 @@ body {
   cursor: pointer;
   transition: color 0.15s;
 }
-.mode-card:hover .mode-footer { color: var(--color-primary); }
+
+.mode-card:hover .mode-footer {
+  color: var(--color-primary);
+}
 
 /* Stats band */
 .stats-band {
@@ -383,7 +427,9 @@ body {
   margin-bottom: 8px;
 }
 
-.stat-number .accent { color: var(--color-primary); }
+.stat-number .accent {
+  color: var(--color-primary);
+}
 
 .stat-label {
   font-size: 13px;
@@ -431,8 +477,13 @@ body {
   color: var(--color-body);
 }
 
-.model-table tr:last-child td { border-bottom: none; }
-.model-table tr:hover td { background: #0f1117; }
+.model-table tr:last-child td {
+  border-bottom: none;
+}
+
+.model-table tr:hover td {
+  background: #0f1117;
+}
 
 .model-name {
   font-family: var(--font-mono), 'JetBrains Mono', monospace;
@@ -471,7 +522,9 @@ body {
 }
 
 /* Demo section */
-.demo-section { background: #000; }
+.demo-section {
+  background: #000;
+}
 
 .demo-grid {
   display: grid;
@@ -543,13 +596,35 @@ body {
   user-select: none;
 }
 
-.kw { color: #7b42bc; }
-.fn { color: var(--color-primary); }
-.st { color: var(--color-success); }
-.cm { color: var(--color-hairline); }
-.nm { color: var(--color-gold-light); }
-.op { color: var(--color-muted); }
-.hi { background: rgba(201, 169, 98, 0.08); margin: 0 -20px; padding: 0 20px; }
+.kw {
+  color: #7b42bc;
+}
+
+.fn {
+  color: var(--color-primary);
+}
+
+.st {
+  color: var(--color-success);
+}
+
+.cm {
+  color: var(--color-hairline);
+}
+
+.nm {
+  color: var(--color-gold-light);
+}
+
+.op {
+  color: var(--color-muted);
+}
+
+.hi {
+  background: rgba(201, 169, 98, 0.08);
+  margin: 0 -20px;
+  padding: 0 20px;
+}
 
 .questions-pane {
   display: flex;
@@ -566,7 +641,11 @@ body {
   transition: border-color 0.2s, background 0.2s;
   cursor: pointer;
 }
-.q-card:hover { border-color: var(--color-hairline); background: #0f1117; }
+
+.q-card:hover {
+  border-color: var(--color-hairline);
+  background: #0f1117;
+}
 
 .q-card.active {
   border-color: rgba(201, 169, 98, 0.4);
