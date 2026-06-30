@@ -90,7 +90,7 @@ export default function RootLayout({
         <Providers>
           <PerformanceMonitor />
           <Header />
-          <div className="flex flex-1">
+          <div className="flex flex-1 pt-[60px]">
             <Sidebar />
             <main className="flex-1 overflow-auto">{children}</main>
           </div>

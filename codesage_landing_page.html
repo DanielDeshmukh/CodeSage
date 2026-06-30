@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeSage</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --blue: #2b89ff;
+    --blue-dim: rgba(43,137,255,0.12);
+    --blue-border: rgba(43,137,255,0.3);
+    --ink: #ffffff;
+    --ink-muted: #b2b6bd;
+    --ink-subtle: #656a76;
+    --s1: #15181e;
+    --s2: #1f232b;
+    --s3: #3b3d45;
+    --hairline: #3b3d45;
+    --hairline-soft: #252830;
+    --success: #00ca8e;
+    --warning: #ffcf25;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #000000;
+    color: #ffffff;
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  code, .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── DOT GRID ── */
+  .dot-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #3b3d45 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 60px;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #252830;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .logo-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: #b2b6bd;
+    text-decoration: none;
+    letter-spacing: 0.1px;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: #fff; }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-ghost {
+    font-size: 13px;
+    font-weight: 600;
+    color: #b2b6bd;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .btn-ghost:hover { color: #fff; background: #15181e; }
+
+  .btn-primary {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    background: #2b89ff;
+    border: none;
+    cursor: pointer;
+    padding: 7px 16px;
+    border-radius: 6px;
+    transition: background 0.15s, transform 0.1s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: #4d9fff; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(43,137,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(43,137,255,0.1);
+    border: 1px solid rgba(43,137,255,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2b89ff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    background: #2b89ff;
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero-title {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2.5px;
+    text-align: center;
+    max-width: 800px;
+    margin-bottom: 24px;
+  }
+
+  .hero-title .accent { color: #2b89ff; }
+
+  .hero-sub {
+    font-size: 18px;
+    font-weight: 400;
+    color: #b2b6bd;
+    text-align: center;
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 72px;
+  }
+
+  .btn-large {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px 24px;
+    border-radius: 8px;
+    gap: 8px;
+  }
+
+  .btn-outline {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: none;
+    border: 1px solid #3b3d45;
+    cursor: pointer;
+    padding: 10px 24px;
+    border-radius: 8px;
+    transition: border-color 0.15s, background 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-outline:hover { border-color: #656a76; background: #15181e; }
+
+  /* ── TERMINAL CARD ── */
+  .terminal {
+    width: 100%;
+    max-width: 700px;
+    background: #0a0c0f;
+    border: 1px solid #252830;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #0f1117;
+    border-bottom: 1px solid #1f232b;
+  }
+
+  .tbar-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .tbar-dot.r { background: #e62b1e; }
+  .tbar-dot.y { background: #ffcf25; }
+  .tbar-dot.g { background: #00ca8e; }
+
+  .tbar-title {
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #656a76;
+    letter-spacing: 0.3px;
+  }
+
+  .terminal-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+  }
+
+  .t-line { display: block; }
+  .t-prompt { color: #656a76; }
+  .t-cmd { color: #2b89ff; }
+  .t-comment { color: #3b3d45; }
+  .t-output { color: #b2b6bd; }
+  .t-success { color: #00ca8e; }
+  .t-warn { color: #ffcf25; }
+  .t-blue { color: #2b89ff; }
+  .t-cursor {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: #2b89ff;
+    vertical-align: text-bottom;
+    animation: blink 1.1s step-end infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* ── SECTION ── */
+  section {
+    padding: 100px 48px;
+    position: relative;
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #2b89ff;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 16px;
+    color: #b2b6bd;
+    line-height: 1.7;
+    max-width: 520px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid #1f232b;
+    margin: 0;
+  }
+
+  /* ── MODE CARDS ── */
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #1f232b;
+    border: 1px solid #1f232b;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 56px;
+  }
+
+  .mode-card {
+    background: #0a0c0f;
+    padding: 36px 32px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .mode-card:hover { background: #0f1117; }
+
+  .mode-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .mode-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .mode-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: 10px;
+  }
+
+  .mode-desc {
+    font-size: 14px;
+    color: #b2b6bd;
+    line-height: 1.65;
+  }
+
+  .mode-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #1f232b;
+    font-size: 12px;
+    font-weight: 600;
+    color: #656a76;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .mode-card:hover .mode-footer { color: #2b89ff; }
+
+  /* ── PIPELINE ── */
+  .pipeline-section {
+    background: #060709;
+    border-top: 1px solid #1f232b;
+    border-bottom: 1px solid #1f232b;
+  }
+
+  .pipeline-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-bottom: 64px;
+  }
+
+  .model-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 40px;
+  }
+
+  .model-table th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #656a76;
+    text-align: left;
+    padding: 0 16px 12px;
+    border-bottom: 1px solid #1f232b;
+  }
+
+  .model-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #0f1117;
+    vertical-align: middle;
+  }
+
+  .model-table tr:last-child td { border-bottom: none; }
+  .model-table tr:hover td { background: #0f1117; }
+
+  .model-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #fff;
+  }
+
+  .model-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .role-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .model-cap {
+    font-size: 12px;
+    color: #b2b6bd;
+  }
+
+  /* ── PIPELINE SVG DIAGRAM ── */
+  .pipeline-diagram {
+    margin-top: 48px;
+    border: 1px solid #1f232b;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #060709;
+  }
+
+  /* ── STATS BAND ── */
+  .stats-band {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #1f232b;
+    border: 1px solid #1f232b;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 48px;
+  }
+
+  .stat-cell {
+    background: #0a0c0f;
+    padding: 32px 28px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-number span { color: #2b89ff; }
+
+  .stat-label {
+    font-size: 13px;
+    color: #656a76;
+    font-weight: 500;
+  }
+
+  /* ── FEATURE STRIP ── */
+  .feature-strip {
+    margin-top: 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .feature-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .feature-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #252830;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .feature-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: #b2b6bd;
+    line-height: 1.65;
+  }
+
+  /* ── QUESTION DEMO ── */
+  .demo-section { background: #000; }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 56px;
+    align-items: start;
+  }
+
+  .code-pane {
+    background: #060709;
+    border: 1px solid #1f232b;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .pane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #0a0c0f;
+    border-bottom: 1px solid #1f232b;
+  }
+
+  .pane-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #656a76;
+    letter-spacing: 0.3px;
+  }
+
+  .lang-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #2b89ff;
+    background: rgba(43,137,255,0.1);
+    border: 1px solid rgba(43,137,255,0.2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    counter-reset: line;
+  }
+
+  .ln {
+    display: block;
+    position: relative;
+    padding-left: 36px;
+  }
+
+  .ln::before {
+    content: counter(line);
+    counter-increment: line;
+    position: absolute;
+    left: 0;
+    width: 22px;
+    text-align: right;
+    color: #3b3d45;
+    font-size: 11px;
+    user-select: none;
+  }
+
+  .kw { color: #7b42bc; }
+  .fn { color: #2b89ff; }
+  .st { color: #00ca8e; }
+  .cm { color: #3b3d45; }
+  .nm { color: #ffcf25; }
+  .op { color: #656a76; }
+  .hi { background: rgba(43,137,255,0.08); margin: 0 -20px; padding: 0 20px; }
+
+  .questions-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .q-card {
+    background: #0a0c0f;
+    border: 1px solid #1f232b;
+    border-radius: 10px;
+    padding: 18px 20px;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .q-card:hover { border-color: #3b3d45; background: #0f1117; }
+
+  .q-card.active {
+    border-color: rgba(43,137,255,0.4);
+    background: rgba(43,137,255,0.04);
+  }
+
+  .q-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #2b89ff;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .q-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .q-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .difficulty-tag {
+    font-size: 10px;
+    color: #656a76;
+    font-weight: 500;
+    margin-left: auto;
+  }
+
+  /* ── SCORING DEMO ── */
+  .score-demo {
+    background: #060709;
+    border: 1px solid #1f232b;
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 12px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .score-label {
+    font-size: 12px;
+    color: #b2b6bd;
+    width: 120px;
+    flex-shrink: 0;
+  }
+
+  .score-bar-bg {
+    flex: 1;
+    height: 4px;
+    background: #1f232b;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  .score-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #fff;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── CTA FOOTER ── */
+  .cta-section {
+    padding: 120px 48px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .cta-section .dot-grid { opacity: 0.4; }
+
+  .cta-glow {
+    position: absolute;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse at center, rgba(43,137,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .cta-sub {
+    font-size: 17px;
+    color: #b2b6bd;
+    margin-bottom: 36px;
+    position: relative;
+    line-height: 1.6;
+  }
+
+  .cta-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid #1f232b;
+    padding: 32px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: #656a76;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-links a {
+    font-size: 12px;
+    color: #656a76;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: #b2b6bd; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #000; }
+  ::-webkit-scrollbar-thumb { background: #252830; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg class="logo-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="6" fill="#0f1117"/>
+      <rect x="1" y="1" width="26" height="26" rx="5" stroke="#252830" stroke-width="1"/>
+      <path d="M7 14L11 10L14 13L17 9L21 14" stroke="#2b89ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="14" cy="14" r="2" fill="#2b89ff"/>
+      <path d="M7 18L10 16L13 18L16 15L21 18" stroke="#3b3d45" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">CodeSage</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#modes">Modes</a></li>
+    <li><a href="#models">AI Pipeline</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="https://github.com/DanielDeshmukh/CodeSage" target="_blank">GitHub ↗</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn-ghost">Sign in</button>
+    <a href="#" class="btn-primary">Start for free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="dot-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    5 NVIDIA NIM models · Live
+  </div>
+
+  <h1 class="hero-title">
+    Your codebase,<br>
+    <span class="accent">interrogated.</span>
+  </h1>
+
+  <p class="hero-sub">
+    CodeSage analyzes your GitHub repository and generates viva-ready questions that go beyond surface documentation — reaching into architecture, trade-offs, and your actual implementation.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="#" class="btn-primary btn-large">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      Connect repository
+    </a>
+    <a href="#demo" class="btn-outline btn-large">
+      See a demo
+    </a>
+  </div>
+
+  <!-- TERMINAL -->
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="tbar-dot r"></span>
+      <span class="tbar-dot y"></span>
+      <span class="tbar-dot g"></span>
+      <span class="tbar-title">codesage — viva session</span>
+    </div>
+    <div class="terminal-body">
+      <span class="t-line"><span class="t-prompt">$ </span><span class="t-cmd">codesage analyze</span> <span class="t-output">github.com/you/your-project</span></span>
+      <span class="t-line t-comment">&nbsp;</span>
+      <span class="t-line"><span class="t-output">✦ Cloning repository...</span></span>
+      <span class="t-line"><span class="t-output">✦ Parsing AST with Tree-sitter (</span><span class="t-blue">TypeScript</span><span class="t-output">, </span><span class="t-blue">Python</span><span class="t-output">)...</span></span>
+      <span class="t-line"><span class="t-output">✦ Embedding </span><span class="t-warn">847 code chunks</span><span class="t-output"> via NV-Embed-QA...</span></span>
+      <span class="t-line"><span class="t-output">✦ Generating examination with Llama-3.3-70B...</span></span>
+      <span class="t-line t-comment">&nbsp;</span>
+      <span class="t-line"><span class="t-success">✓ Ready · 12 questions across 4 difficulty levels</span></span>
+      <span class="t-line t-comment">&nbsp;</span>
+      <span class="t-line"><span class="t-prompt">Q1 </span><span class="t-output">Your </span><span class="t-blue">AuthMiddleware</span><span class="t-output"> validates JWT on every route, but your</span></span>
+      <span class="t-line"><span class="t-output">   </span><span class="t-blue">WebSocket</span><span class="t-output"> handler skips it. Was this intentional? What</span></span>
+      <span class="t-line"><span class="t-output">   are the implications for session hijacking? </span><span class="t-cursor"></span></span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- MODES -->
+<section id="modes">
+  <div class="section-inner">
+    <div class="eyebrow">Examination Modes</div>
+    <h2 class="section-title">Three ways to be tested</h2>
+    <p class="section-sub">Each mode is calibrated to a different evaluation context, from academic defense to industry hiring loops.</p>
+
+    <div class="mode-grid">
+      <!-- Viva -->
+      <div class="mode-card">
+        <div class="mode-icon" style="background: rgba(43,137,255,0.08); border: 1px solid rgba(43,137,255,0.15);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2b89ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="mode-tag" style="background: rgba(43,137,255,0.08); color: #2b89ff;">Viva Voce</div>
+        <div class="mode-title">Oral Defense</div>
+        <div class="mode-desc">Simulates academic examination panels. Questions probe rationale, alternatives considered, and design intent — not just what you built, but why.</div>
+        <div class="mode-footer">
+          Start viva session
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- Technical Interview -->
+      <div class="mode-card">
+        <div class="mode-icon" style="background: rgba(0,202,142,0.08); border: 1px solid rgba(0,202,142,0.15);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ca8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="mode-tag" style="background: rgba(0,202,142,0.08); color: #00ca8e;">Technical Interview</div>
+        <div class="mode-title">Industry Hiring Loop</div>
+        <div class="mode-desc">Replicates FAANG-style system design and code review rounds. Surfaces scalability gaps, edge cases, and algorithmic trade-offs in your actual codebase.</div>
+        <div class="mode-footer">
+          Start interview
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- Code Review -->
+      <div class="mode-card">
+        <div class="mode-icon" style="background: rgba(255,207,37,0.08); border: 1px solid rgba(255,207,37,0.15);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffcf25" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </div>
+        <div class="mode-tag" style="background: rgba(255,207,37,0.08); color: #ffcf25;">Code Review</div>
+        <div class="mode-title">Peer Review Sim</div>
+        <div class="mode-desc">Generates senior-engineer-level feedback on architecture, coupling, test coverage, and documentation — framed as questions you should be able to answer.</div>
+        <div class="mode-footer">
+          Start review
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-band">
+      <div class="stat-cell">
+        <div class="stat-number"><span>5</span></div>
+        <div class="stat-label">Specialized NIM models</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">15<span>+</span></div>
+        <div class="stat-label">Languages via Tree-sitter</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number"><span>~</span>3s</div>
+        <div class="stat-label">Time to first question</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Difficulty levels</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- AI PIPELINE -->
+<section id="models" class="pipeline-section">
+  <div class="section-inner">
+    <div class="pipeline-header">
+      <div>
+        <div class="eyebrow">AI Pipeline</div>
+        <h2 class="section-title">Five models.<br>One examiner.</h2>
+        <p class="section-sub" style="margin-top:16px;">No single model handles examination well. CodeSage routes each task to a specialist — embedding, ranking, generation, scoring, and safety run as a coordinated pipeline.</p>
+      </div>
+      <div>
+        <table class="model-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Role</th>
+              <th>Task</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="model-name">NV-Embed-QA</span></td>
+              <td>
+                <span class="model-role-badge" style="background: rgba(43,137,255,0.08); color: #2b89ff;">
+                  <span class="role-dot" style="background:#2b89ff;"></span>Embedding
+                </span>
+              </td>
+              <td><span class="model-cap">Semantic code chunks</span></td>
+            </tr>
+            <tr>
+              <td><span class="model-name">NV-Rerank-QA</span></td>
+              <td>
+                <span class="model-role-badge" style="background: rgba(123,66,188,0.1); color: #a060e0;">
+                  <span class="role-dot" style="background:#a060e0;"></span>Reranking
+                </span>
+              </td>
+              <td><span class="model-cap">Query relevance scoring</span></td>
+            </tr>
+            <tr>
+              <td><span class="model-name">Llama-3.3-70B</span></td>
+              <td>
+                <span class="model-role-badge" style="background: rgba(0,202,142,0.08); color: #00ca8e;">
+                  <span class="role-dot" style="background:#00ca8e;"></span>Examiner
+                </span>
+              </td>
+              <td><span class="model-cap">Question generation</span></td>
+            </tr>
+            <tr>
+              <td><span class="model-name">Nemotron-70B-Reward</span></td>
+              <td>
+                <span class="model-role-badge" style="background: rgba(255,207,37,0.08); color: #ffcf25;">
+                  <span class="role-dot" style="background:#ffcf25;"></span>Scorer
+                </span>
+              </td>
+              <td><span class="model-cap">Objective answer grading</span></td>
+            </tr>
+            <tr>
+              <td><span class="model-name">Llama-Guard-3-8B</span></td>
+              <td>
+                <span class="model-role-badge" style="background: rgba(230,43,30,0.08); color: #e66;">
+                  <span class="role-dot" style="background:#e66;"></span>Safety
+                </span>
+              </td>
+              <td><span class="model-cap">Content moderation</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pipeline SVG -->
+    <div class="pipeline-diagram">
+      <svg viewBox="0 0 1060 180" xmlns="http://www.w3.org/2000/svg" style="width:100%; display:block;">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#3b3d45"/>
+          </marker>
+        </defs>
+
+        <!-- BG dots -->
+        <pattern id="pg" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="10" cy="10" r="0.8" fill="#1f232b"/>
+        </pattern>
+        <rect width="1060" height="180" fill="url(#pg)"/>
+
+        <!-- Boxes -->
+        <!-- GitHub -->
+        <rect x="20" y="65" width="140" height="50" rx="6" fill="#0a0c0f" stroke="#252830" stroke-width="1"/>
+        <text x="90" y="86" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle" letter-spacing="0.5">INPUT</text>
+        <text x="90" y="103" font-family="Inter" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">GitHub URL</text>
+
+        <!-- Arrow -->
+        <line x1="160" y1="90" x2="195" y2="90" stroke="#3b3d45" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- AST Parser -->
+        <rect x="197" y="55" width="140" height="70" rx="6" fill="#0a0c0f" stroke="#252830" stroke-width="1"/>
+        <text x="267" y="78" font-family="JetBrains Mono" font-size="10" fill="#2b89ff" text-anchor="middle" letter-spacing="0.5">AST</text>
+        <text x="267" y="97" font-family="Inter" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Tree-sitter</text>
+        <text x="267" y="113" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle">Parser</text>
+
+        <!-- Arrow -->
+        <line x1="337" y1="90" x2="372" y2="90" stroke="#3b3d45" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- Embed -->
+        <rect x="374" y="55" width="140" height="70" rx="6" fill="#0a0c0f" stroke="rgba(43,137,255,0.25)" stroke-width="1"/>
+        <text x="444" y="78" font-family="JetBrains Mono" font-size="10" fill="#2b89ff" text-anchor="middle" letter-spacing="0.5">NIM</text>
+        <text x="444" y="97" font-family="Inter" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">NV-Embed</text>
+        <text x="444" y="113" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle">→ Qdrant</text>
+
+        <!-- Arrow -->
+        <line x1="514" y1="90" x2="549" y2="90" stroke="#3b3d45" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- Examiner -->
+        <rect x="551" y="45" width="140" height="90" rx="6" fill="#0a0c0f" stroke="rgba(0,202,142,0.25)" stroke-width="1"/>
+        <text x="621" y="72" font-family="JetBrains Mono" font-size="10" fill="#00ca8e" text-anchor="middle" letter-spacing="0.5">EXAMINER</text>
+        <text x="621" y="92" font-family="Inter" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Llama 70B</text>
+        <text x="621" y="109" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle">+ NV-Rerank</text>
+        <text x="621" y="124" font-family="JetBrains Mono" font-size="9" fill="#3b3d45" text-anchor="middle">question gen</text>
+
+        <!-- Arrow -->
+        <line x1="691" y1="90" x2="726" y2="90" stroke="#3b3d45" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- Scorer -->
+        <rect x="728" y="55" width="140" height="70" rx="6" fill="#0a0c0f" stroke="rgba(255,207,37,0.2)" stroke-width="1"/>
+        <text x="798" y="78" font-family="JetBrains Mono" font-size="10" fill="#ffcf25" text-anchor="middle" letter-spacing="0.5">SCORER</text>
+        <text x="798" y="97" font-family="Inter" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Reward Model</text>
+        <text x="798" y="113" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle">objective grade</text>
+
+        <!-- Arrow -->
+        <line x1="868" y1="90" x2="903" y2="90" stroke="#3b3d45" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- Output -->
+        <rect x="905" y="55" width="140" height="70" rx="6" fill="#0a0c0f" stroke="#252830" stroke-width="1"/>
+        <text x="975" y="78" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle" letter-spacing="0.5">OUTPUT</text>
+        <text x="975" y="97" font-family="Inter" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Report +</text>
+        <text x="975" y="113" font-family="JetBrains Mono" font-size="10" fill="#656a76" text-anchor="middle">Study Guide</text>
+
+        <!-- Guard label at bottom -->
+        <rect x="551" y="148" width="140" height="22" rx="4" fill="rgba(230,43,30,0.06)" stroke="rgba(230,43,30,0.15)" stroke-width="0.5"/>
+        <text x="621" y="163" font-family="JetBrains Mono" font-size="10" fill="#e66" text-anchor="middle" letter-spacing="0.3">Llama-Guard-3 · Safety</text>
+        <line x1="621" y1="135" x2="621" y2="148" stroke="rgba(230,43,30,0.2)" stroke-width="0.5" stroke-dasharray="2,2"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- DEMO -->
+<section id="demo" class="demo-section">
+  <div class="section-inner">
+    <div class="eyebrow">Live Demo</div>
+    <h2 class="section-title">Questions from real code</h2>
+    <p class="section-sub">These questions were generated from an actual Next.js repository. The examiner read the source — not the README.</p>
+
+    <div class="demo-grid">
+      <!-- Code Pane -->
+      <div class="code-pane">
+        <div class="pane-header">
+          <span class="pane-title">src/middleware/auth.ts</span>
+          <span class="lang-tag">TS</span>
+        </div>
+        <div class="code-body">
+          <span class="ln"><span class="kw">import</span> <span class="op">{</span> NextRequest, NextResponse <span class="op">}</span> <span class="kw">from</span> <span class="st">'next/server'</span></span>
+          <span class="ln"><span class="kw">import</span> <span class="op">{</span> verify <span class="op">}</span> <span class="kw">from</span> <span class="st">'jsonwebtoken'</span></span>
+          <span class="ln"><span class="cm">// ← examined by CodeSage</span></span>
+          <span class="ln">&nbsp;</span>
+          <span class="ln"><span class="kw">export</span> <span class="kw">function</span> <span class="fn">authMiddleware</span><span class="op">(</span></span>
+          <span class="ln">  <span class="nm">req</span><span class="op">:</span> NextRequest</span>
+          <span class="ln"><span class="op">) {</span></span>
+          <span class="ln">  <span class="kw">const</span> <span class="nm">token</span> <span class="op">=</span> req<span class="op">.</span><span class="fn">cookies</span><span class="op">.</span><span class="fn">get</span><span class="op">(</span><span class="st">'session'</span><span class="op">)</span></span>
+          <span class="ln hi">  <span class="kw">if</span> <span class="op">(!</span>token<span class="op">)</span> <span class="kw">return</span> NextResponse<span class="op">.</span><span class="fn">redirect</span><span class="op">(</span><span class="st">'/login'</span><span class="op">)</span></span>
+          <span class="ln">&nbsp;</span>
+          <span class="ln">  <span class="kw">try</span> <span class="op">{</span></span>
+          <span class="ln">    <span class="fn">verify</span><span class="op">(</span>token<span class="op">.</span>value<span class="op">,</span> process<span class="op">.</span>env<span class="op">.</span>JWT_SECRET<span class="op">!)</span></span>
+          <span class="ln">    <span class="kw">return</span> NextResponse<span class="op">.</span><span class="fn">next</span><span class="op">()</span></span>
+          <span class="ln">  <span class="op">}</span> <span class="kw">catch</span> <span class="op">{</span></span>
+          <span class="ln hi">    <span class="cm">// silent fail — returns undefined</span></span>
+          <span class="ln">  <span class="op">}</span></span>
+          <span class="ln"><span class="op">}</span></span>
+        </div>
+
+        <!-- Score demo -->
+        <div style="padding: 0 20px 20px;">
+          <div style="font-size:11px; font-weight:600; color:#656a76; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:12px;">Session score</div>
+          <div class="score-demo">
+            <div class="score-row">
+              <span class="score-label">Correctness</span>
+              <div class="score-bar-bg"><div class="score-bar-fill" style="width:84%; background:#2b89ff;"></div></div>
+              <span class="score-pct">84%</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">Depth</span>
+              <div class="score-bar-bg"><div class="score-bar-fill" style="width:71%; background:#00ca8e;"></div></div>
+              <span class="score-pct">71%</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">Security</span>
+              <div class="score-bar-bg"><div class="score-bar-fill" style="width:42%; background:#ffcf25;"></div></div>
+              <span class="score-pct">42%</span>
+            </div>
+            <div class="score-row" style="margin-bottom:0">
+              <span class="score-label">Architecture</span>
+              <div class="score-bar-bg"><div class="score-bar-fill" style="width:68%; background:#a060e0;"></div></div>
+              <span class="score-pct">68%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-pane">
+        <div style="font-size:11px; font-weight:600; color:#656a76; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:16px;">Generated questions</div>
+
+        <div class="q-card active">
+          <div class="q-number">Q 01 · AUTH.TS:10</div>
+          <div class="q-text">The catch block on line 14 swallows the error silently. If JWT verification fails, the function returns <code style="font-size:12px; color:#2b89ff;">undefined</code> — not a redirect. How does Next.js handle a middleware that returns undefined?</div>
+          <div class="q-meta">
+            <span class="q-tag" style="background:rgba(230,43,30,0.1); color:#e66;">Security</span>
+            <span class="q-tag" style="background:rgba(43,137,255,0.08); color:#2b89ff;">Middleware</span>
+            <span class="difficulty-tag">Hard</span>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-number">Q 02 · AUTH.TS:7</div>
+          <div class="q-text">You're reading the token from <code style="font-size:12px; color:#2b89ff;">req.cookies</code>. What are the CSRF implications of cookie-based JWT vs Authorization header?</div>
+          <div class="q-meta">
+            <span class="q-tag" style="background:rgba(230,43,30,0.1); color:#e66;">Security</span>
+            <span class="difficulty-tag">Medium</span>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-number">Q 03 · ENV</div>
+          <div class="q-text">You use a non-null assertion on <code style="font-size:12px; color:#2b89ff;">process.env.JWT_SECRET!</code>. What happens in production if this variable is unset, and how would you guard against it?</div>
+          <div class="q-meta">
+            <span class="q-tag" style="background:rgba(255,207,37,0.08); color:#ffcf25;">Config</span>
+            <span class="q-tag" style="background:rgba(43,137,255,0.08); color:#2b89ff;">TypeScript</span>
+            <span class="difficulty-tag">Easy</span>
+          </div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-number">Q 04 · ARCHITECTURE</div>
+          <div class="q-text">This middleware runs at the edge but <code style="font-size:12px; color:#2b89ff;">verify()</code> from jsonwebtoken is a Node.js library. Why might this cause silent failures in Vercel Edge Runtime?</div>
+          <div class="q-meta">
+            <span class="q-tag" style="background:rgba(123,66,188,0.1); color:#a060e0;">Architecture</span>
+            <span class="difficulty-tag">Expert</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="feature-strip">
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b89ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        </div>
+        <div class="feature-title">Direct GitHub import</div>
+        <div class="feature-desc">Paste any public or private repo URL. CodeSage clones, parses, and analyzes — no local setup required.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00ca8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="feature-title">AST-level analysis</div>
+        <div class="feature-desc">Tree-sitter parses your code into an abstract syntax tree — questions reference actual line numbers, not summaries.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffcf25" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="feature-title">Personalized study guides</div>
+        <div class="feature-desc">After each session, a scored breakdown maps your weak areas to specific concepts worth reviewing before the real exam.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a060e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="feature-title">Progress tracking</div>
+        <div class="feature-desc">Historical session scores tracked across runs so you can see which areas have improved — and which need more work.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b89ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="feature-title">Objective scoring</div>
+        <div class="feature-desc">The Nemotron reward model evaluates answers against rubrics — not vibes. Scores are reproducible and explainable.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00ca8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-title">Built-in content safety</div>
+        <div class="feature-desc">Llama Guard 3 runs alongside the examiner, ensuring every generated question stays within appropriate academic scope.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="dot-grid"></div>
+  <div class="cta-glow"></div>
+
+  <h2 class="cta-title">Know your<br><span style="color:#2b89ff;">own code.</span></h2>
+  <p class="cta-sub">Connect your repository and start your first viva session in under a minute.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-primary btn-large">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      Connect your repo
+    </a>
+    <a href="https://github.com/DanielDeshmukh/CodeSage" class="btn-outline btn-large" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      View on GitHub
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-copy">© 2025 CodeSage · Built with NVIDIA NIM</span>
+  <div class="footer-links">
+    <a href="#">Docs</a>
+    <a href="#">Privacy</a>
+    <a href="#">MIT License</a>
+    <a href="https://github.com/DanielDeshmukh/CodeSage" target="_blank">GitHub ↗</a>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.q-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.q-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
