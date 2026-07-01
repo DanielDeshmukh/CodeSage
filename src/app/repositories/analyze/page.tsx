@@ -7,64 +7,88 @@ import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import Link from "next/link";
 
-type AnalysisStep = "cloning" | "parsing" | "embedding" | "indexing" | "complete";
+type AnalysisStep = "analyzing" | "complete" | "error";
 
 const steps: { key: AnalysisStep; label: string }[] = [
-  { key: "cloning", label: "Cloning Repository" },
-  { key: "parsing", label: "Parsing Source Code" },
-  { key: "embedding", label: "Generating Embeddings" },
-  { key: "indexing", label: "Indexing to Vector Store" },
+  { key: "analyzing", label: "Analyzing Repository" },
+  { key: "complete", label: "Complete" },
 ];
+
+interface AnalysisResult {
+  success: boolean;
+  repositoryId: string;
+  stats: {
+    files: number;
+    chunks: number;
+    lines: number;
+    languages: string[];
+  };
+  error?: string;
+  durationMs?: number;
+}
 
 function AnalysisContent() {
   const searchParams = useSearchParams();
   const repoUrl = searchParams?.get("url") || "";
 
-  const [currentStep, setCurrentStep] = useState<AnalysisStep>("cloning");
+  const [step, setStep] = useState<AnalysisStep>("analyzing");
+  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [progress, setProgress] = useState(0);
-  const [stats, setStats] = useState({
-    files: 0,
-    chunks: 0,
-    lines: 0,
-    languages: [] as string[],
-  });
 
   useEffect(() => {
-    // Simulate analysis progress
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          return 100;
-        }
-        return prev + 2;
-      });
-    }, 100);
+    if (!repoUrl) {
+      setStep("error");
+      return;
+    }
 
-    // Simulate step progression
-    const stepTimer = setTimeout(() => setCurrentStep("parsing"), 2000);
-    const stepTimer2 = setTimeout(() => setCurrentStep("embedding"), 4000);
-    const stepTimer3 = setTimeout(() => setCurrentStep("indexing"), 6000);
-    const stepTimer4 = setTimeout(() => {
-      setCurrentStep("complete");
-      setStats({
-        files: 47,
-        chunks: 156,
-        lines: 3240,
-        languages: ["TypeScript", "JavaScript", "CSS"],
-      });
-    }, 8000);
+    let cancelled = false;
+
+    const analyze = async () => {
+      try {
+        const res = await fetch("/api/repos/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ repoUrl }),
+        });
+
+        if (cancelled) return;
+
+        const data = await res.json();
+
+        if (!cancelled) {
+          if (data.success) {
+            setResult(data);
+            setProgress(100);
+            setStep("complete");
+          } else {
+            setResult(data);
+            setStep("error");
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setStep("error");
+          setResult({
+            success: false,
+            repositoryId: "",
+            stats: { files: 0, chunks: 0, lines: 0, languages: [] },
+            error: err instanceof Error ? err.message : "An unexpected error occurred",
+          });
+        }
+      }
+    };
+
+    analyze();
 
     return () => {
-      clearInterval(timer);
-      clearTimeout(stepTimer);
-      clearTimeout(stepTimer2);
-      clearTimeout(stepTimer3);
-      clearTimeout(stepTimer4);
+      cancelled = true;
     };
-  }, []);
+  }, [repoUrl]);
 
-  const currentStepIndex = steps.findIndex((s) => s.key === currentStep);
+  const currentStepIndex = steps.findIndex((s) => s.key === step);
+  const isAnalyzing = step === "analyzing";
+  const isComplete = step === "complete";
+  const isError = step === "error";
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -79,27 +103,25 @@ function AnalysisContent() {
           <CardTitle className="text-lg">Analysis Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          <ProgressBar value={progress} showLabel />
+          <ProgressBar value={isComplete ? 100 : isAnalyzing ? progress : 0} showLabel />
 
           {/* Steps */}
           <div className="mt-8 space-y-4">
-            {steps.map((step, index) => {
-              const isComplete = index < currentStepIndex;
-              const isCurrent = index === currentStepIndex;
-              const isPending = index > currentStepIndex;
-
+            {steps.map((s, index) => {
+              const isCompleteStep = index < currentStepIndex || (s.key === "complete" && isComplete);
+              const isCurrent = s.key === step;
               return (
-                <div key={step.key} className="flex items-center gap-4">
+                <div key={s.key} className="flex items-center gap-4">
                   <div
                     className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
-                      isComplete
+                      isCompleteStep && s.key !== "analyzing"
                         ? "bg-success text-ink"
                         : isCurrent
                           ? "bg-primary text-ink"
                           : "bg-surface-elevated text-muted"
                     }`}
                   >
-                    {isComplete ? (
+                    {isCompleteStep && s.key === "complete" ? (
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -112,15 +134,15 @@ function AnalysisContent() {
                       className={`font-medium ${
                         isCurrent
                           ? "text-ink"
-                          : isComplete
+                          : isCompleteStep
                             ? "text-success"
                             : "text-muted"
                       }`}
                     >
-                      {step.label}
+                      {s.label}
                     </p>
                   </div>
-                  {isCurrent && (
+                  {isCurrent && isAnalyzing && (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                   )}
                 </div>
@@ -130,8 +152,28 @@ function AnalysisContent() {
         </CardContent>
       </Card>
 
+      {/* Error */}
+      {isError && result?.error && (
+        <Card variant="dark" className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg text-error">Analysis Failed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted">{result.error}</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Link href="/repositories">
+                <Button variant="ghost">View All Repos</Button>
+              </Link>
+              <Button variant="primary" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Stats (shown after completion) */}
-      {currentStep === "complete" && (
+      {isComplete && result?.stats && (
         <Card variant="dark" className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg">Analysis Complete</CardTitle>
@@ -139,22 +181,22 @@ function AnalysisContent() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{stats.files}</p>
+                <p className="text-2xl font-bold text-primary">{result.stats.files}</p>
                 <p className="text-sm text-muted">Files</p>
               </div>
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{stats.chunks}</p>
+                <p className="text-2xl font-bold text-primary">{result.stats.chunks}</p>
                 <p className="text-sm text-muted">Chunks</p>
               </div>
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
                 <p className="text-2xl font-bold text-primary">
-                  {stats.lines.toLocaleString()}
+                  {result.stats.lines.toLocaleString()}
                 </p>
                 <p className="text-sm text-muted">Lines</p>
               </div>
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
                 <p className="text-2xl font-bold text-primary">
-                  {stats.languages.length}
+                  {result.stats.languages.length}
                 </p>
                 <p className="text-sm text-muted">Languages</p>
               </div>
@@ -163,7 +205,7 @@ function AnalysisContent() {
             <div className="mt-6">
               <p className="text-sm font-medium text-ink">Languages Detected</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {stats.languages.map((lang) => (
+                {result.stats.languages.map((lang) => (
                   <span
                     key={lang}
                     className="rounded-full bg-surface px-3 py-1 text-xs text-muted"
@@ -174,11 +216,17 @@ function AnalysisContent() {
               </div>
             </div>
 
+            {result.durationMs && (
+              <p className="mt-4 text-sm text-muted">
+                Completed in {(result.durationMs / 1000).toFixed(1)}s
+              </p>
+            )}
+
             <div className="mt-6 flex justify-end gap-3">
               <Link href="/repositories">
                 <Button variant="ghost">View All Repos</Button>
               </Link>
-              <Link href={`/exam?repo=${encodeURIComponent(repoUrl)}`}>
+              <Link href={`/exam/select?repo=${encodeURIComponent(result.repositoryId)}`}>
                 <Button variant="primary">Start Exam</Button>
               </Link>
             </div>

@@ -1,67 +1,115 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
-const mockRepositories = [
-  {
-    id: "1",
-    name: "codesage",
-    fullName: "DanielDeshmukh/CodeSage",
-    language: "TypeScript",
-    status: "ready" as const,
-    stars: 12,
-    chunks: 156,
-  },
-  {
-    id: "2",
-    name: "next.js",
-    fullName: "vercel/next.js",
-    language: "TypeScript",
-    status: "ready" as const,
-    stars: 128000,
-    chunks: 4521,
-  },
-  {
-    id: "3",
-    name: "react",
-    fullName: "facebook/react",
-    language: "JavaScript",
-    status: "indexing" as const,
-    stars: 230000,
-    chunks: 0,
-  },
-];
+interface Repository {
+  id: string;
+  name: string;
+  url: string;
+  stats: Record<string, unknown>;
+  createdAt: string;
+}
 
-const mockSessions = [
-  {
-    id: "1",
-    repositoryName: "codesage",
-    mode: "viva",
-    score: 75,
-    completedAt: "2026-06-28T10:30:00Z",
-  },
-  {
-    id: "2",
-    repositoryName: "next.js",
-    mode: "interview",
-    score: 82,
-    completedAt: "2026-06-27T15:45:00Z",
-  },
-];
-
-const statusColors = {
-  pending: "muted",
-  cloning: "info",
-  parsing: "info",
-  indexing: "info",
-  ready: "success",
-  error: "danger",
-} as const;
+interface Exam {
+  id: string;
+  repositoryId: string;
+  mode: string;
+  difficulty: string;
+  status: string;
+  startedAt: string;
+  questions: unknown[];
+  answers: unknown[];
+}
 
 export default function DashboardPage() {
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [reposRes, examsRes] = await Promise.all([
+          fetch("/api/repos"),
+          fetch("/api/exams"),
+        ]);
+
+        if (!reposRes.ok || !examsRes.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+
+        const reposData = await reposRes.json();
+        const examsData = await examsRes.json();
+
+        setRepositories(reposData.repositories ?? []);
+        setExams(examsData.exams ?? []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-ink">Dashboard</h1>
+          <p className="mt-2 text-muted">
+            Overview of your repositories and exam sessions
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <p className="text-muted">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-ink">Dashboard</h1>
+          <p className="mt-2 text-muted">
+            Overview of your repositories and exam sessions
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4 py-20">
+          <p className="text-danger">{error}</p>
+          <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const averageScore =
+    exams.length > 0
+      ? Math.round(exams.filter((e) => e.answers.length > 0).length > 0
+          ? exams.reduce((sum, e) => {
+              const score =
+                e.answers.length > 0
+                  ? Math.round((e.answers.length / e.questions.length) * 100)
+                  : 0;
+              return sum + score;
+            }, 0) / exams.filter((e) => e.answers.length > 0).length
+          : 0)
+      : 0;
+
+  const totalChunks = repositories.reduce((sum, r) => {
+    const stats = r.stats as { chunks?: number } | undefined;
+    return sum + (stats?.chunks ?? 0);
+  }, 0);
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-8">
@@ -77,7 +125,7 @@ export default function DashboardPage() {
           <CardContent className="p-6">
             <p className="text-sm text-muted">Total Repositories</p>
             <p className="mt-2 text-3xl font-bold text-primary">
-              {mockRepositories.length}
+              {repositories.length}
             </p>
           </CardContent>
         </Card>
@@ -85,7 +133,7 @@ export default function DashboardPage() {
           <CardContent className="p-6">
             <p className="text-sm text-muted">Exam Sessions</p>
             <p className="mt-2 text-3xl font-bold text-primary">
-              {mockSessions.length}
+              {exams.length}
             </p>
           </CardContent>
         </Card>
@@ -93,11 +141,7 @@ export default function DashboardPage() {
           <CardContent className="p-6">
             <p className="text-sm text-muted">Average Score</p>
             <p className="mt-2 text-3xl font-bold text-primary">
-              {Math.round(
-                mockSessions.reduce((sum, s) => sum + s.score, 0) /
-                  mockSessions.length
-              )}
-              %
+              {averageScore}%
             </p>
           </CardContent>
         </Card>
@@ -105,9 +149,7 @@ export default function DashboardPage() {
           <CardContent className="p-6">
             <p className="text-sm text-muted">Total Chunks</p>
             <p className="mt-2 text-3xl font-bold text-primary">
-              {mockRepositories
-                .reduce((sum, r) => sum + r.chunks, 0)
-                .toLocaleString()}
+              {totalChunks.toLocaleString()}
             </p>
           </CardContent>
         </Card>
@@ -125,27 +167,37 @@ export default function DashboardPage() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {mockRepositories.map((repo) => (
-                <div
-                  key={repo.id}
-                  className="flex items-center justify-between rounded-lg border border-hairline p-4"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-ink truncate">
-                      {repo.name}
-                    </p>
-                    <p className="text-xs text-muted truncate">{repo.fullName}</p>
+            {repositories.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-8">
+                <p className="text-muted">No repositories yet</p>
+                <Link href="/repositories">
+                  <Button variant="ghost" size="sm">
+                    Add Repository
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {repositories.map((repo) => (
+                  <div
+                    key={repo.id}
+                    className="flex items-center justify-between rounded-lg border border-hairline p-4"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-ink truncate">
+                        {repo.name}
+                      </p>
+                      <p className="text-xs text-muted truncate">{repo.url}</p>
+                    </div>
+                    <div className="ml-4 flex items-center gap-3">
+                      <span className="text-xs text-muted">
+                        {new Date(repo.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="ml-4 flex items-center gap-3">
-                    <span className="text-xs text-muted">{repo.language}</span>
-                    <Badge variant={statusColors[repo.status]} dot>
-                      {repo.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -160,36 +212,53 @@ export default function DashboardPage() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {mockSessions.map((session) => (
-                <div
-                  key={session.id}
-                  className="flex items-center justify-between rounded-lg border border-hairline p-4"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-ink">
-                      {session.repositoryName}
-                    </p>
-                    <p className="text-xs text-muted capitalize">
-                      {session.mode} mode
-                    </p>
-                  </div>
-                  <div className="ml-4 flex items-center gap-3">
-                    <span
-                      className={`text-lg font-bold ${
-                        session.score >= 70
-                          ? "text-success"
-                          : session.score >= 50
-                            ? "text-primary"
-                            : "text-danger"
-                      }`}
+            {exams.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-8">
+                <p className="text-muted">No exam sessions yet</p>
+                <Link href="/exam">
+                  <Button variant="ghost" size="sm">
+                    Start Exam
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {exams.map((exam) => {
+                  const score =
+                    exam.questions.length > 0
+                      ? Math.round((exam.answers.length / exam.questions.length) * 100)
+                      : 0;
+                  return (
+                    <div
+                      key={exam.id}
+                      className="flex items-center justify-between rounded-lg border border-hairline p-4"
                     >
-                      {session.score}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-ink">
+                          {exam.repositoryId}
+                        </p>
+                        <p className="text-xs text-muted capitalize">
+                          {exam.mode} mode
+                        </p>
+                      </div>
+                      <div className="ml-4 flex items-center gap-3">
+                        <span
+                          className={`text-lg font-bold ${
+                            score >= 70
+                              ? "text-success"
+                              : score >= 50
+                                ? "text-primary"
+                                : "text-danger"
+                          }`}
+                        >
+                          {score}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -2,53 +2,74 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScoreGauge } from "@/components/ui/score-gauge";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
-const mockReport = {
-  sessionId: "1",
-  repositoryName: "CodeSage",
-  mode: "viva",
-  completedAt: "2026-06-28T10:30:00Z",
+interface ReportData {
+  sessionId: string;
+  repositoryId: string;
+  mode: string;
+  completedAt: string;
   scores: {
-    overall: 75,
-    architecture: 85,
-    codeDetail: 72,
-    scalability: 68,
-  },
-  questionBreakdown: [
-    {
-      id: "1",
-      question: "Explain the purpose of the NIM Gateway singleton pattern",
-      filePath: "src/ai/nim/gateway.ts",
-      accuracy: 85,
-      depth: 78,
-      awareness: 70,
-      feedback: "Good understanding of the singleton pattern. Could elaborate more on thread safety considerations.",
-    },
-    {
-      id: "2",
-      question: "How does the AST parser handle nested function declarations?",
-      filePath: "src/backend/ast/parser.ts",
-      accuracy: 70,
-      depth: 65,
-      awareness: 60,
-      feedback: "Basic understanding shown. Needs deeper knowledge of AST traversal algorithms.",
-    },
-    {
-      id: "3",
-      question: "What are the trade-offs of using in-memory session storage?",
-      filePath: "src/ai/examiner/session.ts",
-      accuracy: 90,
-      depth: 82,
-      awareness: 75,
-      feedback: "Excellent analysis of scalability vs simplicity trade-offs.",
-    },
-  ],
-};
+    overall: number;
+    architecture: number;
+    codeDetail: number;
+    scalability: number;
+  };
+  questionBreakdown: {
+    id: string;
+    question: string;
+    filePath: string;
+    accuracy: number;
+    depth: number;
+    awareness: number;
+    feedback: string;
+  }[];
+}
 
 export default function ScoreReportPage() {
+  const params = useParams();
+  const sessionId = params.sessionId as string;
+  const [report, setReport] = useState<ReportData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchReport() {
+      try {
+        const res = await fetch(`/api/reports/${sessionId}`);
+        if (!res.ok) throw new Error("Failed to fetch report");
+        const data = await res.json();
+        setReport(data.report);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load report");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchReport();
+  }, [sessionId]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-5xl px-6 py-12">
+        <div className="py-20 text-center text-muted">Loading report...</div>
+      </div>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <div className="mx-auto max-w-5xl px-6 py-12">
+        <div className="py-20 text-center text-danger">
+          {error || "Report not found"}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       {/* Header */}
@@ -56,10 +77,10 @@ export default function ScoreReportPage() {
         <div>
           <h1 className="text-3xl font-bold text-ink">Score Report</h1>
           <p className="mt-2 text-muted">
-            {mockReport.repositoryName} • {mockReport.mode} mode
+            {report.repositoryId} • {report.mode} mode
           </p>
           <p className="text-sm text-muted">
-            Completed on {new Date(mockReport.completedAt).toLocaleDateString()}
+            Completed on {new Date(report.completedAt).toLocaleDateString()}
           </p>
         </div>
         <div className="flex gap-3">
@@ -75,23 +96,23 @@ export default function ScoreReportPage() {
         <CardContent className="p-8">
           <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center">
             <ScoreGauge
-              score={mockReport.scores.overall}
+              score={report.scores.overall}
               size="lg"
               label="Overall Score"
             />
             <div className="grid grid-cols-3 gap-8">
               <ScoreGauge
-                score={mockReport.scores.architecture}
+                score={report.scores.architecture}
                 size="md"
                 label="Architecture"
               />
               <ScoreGauge
-                score={mockReport.scores.codeDetail}
+                score={report.scores.codeDetail}
                 size="md"
                 label="Code Detail"
               />
               <ScoreGauge
-                score={mockReport.scores.scalability}
+                score={report.scores.scalability}
                 size="md"
                 label="Scalability"
               />
@@ -110,17 +131,17 @@ export default function ScoreReportPage() {
             {[
               {
                 name: "Architecture",
-                score: mockReport.scores.architecture,
+                score: report.scores.architecture,
                 description: "Understanding of system design and architectural decisions",
               },
               {
                 name: "Code Detail",
-                score: mockReport.scores.codeDetail,
+                score: report.scores.codeDetail,
                 description: "Knowledge of implementation details and algorithms",
               },
               {
                 name: "Scalability",
-                score: mockReport.scores.scalability,
+                score: report.scores.scalability,
                 description: "Awareness of performance and scalability considerations",
               },
             ].map((dim) => (
@@ -167,7 +188,7 @@ export default function ScoreReportPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockReport.questionBreakdown.map((q, i) => (
+            {report.questionBreakdown.map((q, i) => (
               <div key={q.id} className="rounded-lg border border-hairline p-4">
                 <div className="flex items-start gap-4">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-ink">
