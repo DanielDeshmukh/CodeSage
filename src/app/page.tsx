@@ -10,7 +10,7 @@ const examModes = [
     iconBg: "rgba(201,169,98,0.08)",
     iconBorder: "rgba(201,169,98,0.15)",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
     ),
     title: "Oral Defense",
     desc: "Simulates academic examination panels. Questions probe rationale, alternatives considered, and design intent — not just what you built, but why.",
@@ -22,7 +22,7 @@ const examModes = [
     iconBg: "rgba(72,187,120,0.08)",
     iconBorder: "rgba(72,187,120,0.15)",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
     ),
     title: "Industry Hiring Loop",
     desc: "Replicates FAANG-style system design and code review rounds. Surfaces scalability gaps, edge cases, and algorithmic trade-offs in your actual codebase.",
@@ -34,10 +34,10 @@ const examModes = [
     iconBg: "rgba(232,213,163,0.08)",
     iconBorder: "rgba(232,213,163,0.15)",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-light)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-light)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /><line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" /></svg>
     ),
     title: "Peer Review Sim",
-    desc: "Generates senior-engineer-level feedback on architecture, coupling, test coverage, and documentation — framed as questions you should be able to answer.",
+    desc: "Generates senior-engineer-level feedback on architecture, coupling, test coverage, and documentation framed as questions you should be able to answer.",
     footer: "Start review",
   },
 ];
@@ -90,32 +90,32 @@ const questions = [
 
 const features = [
   {
-    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>,
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg>,
     title: "Direct GitHub import",
     desc: "Paste any public or private repo URL. CodeSage clones, parses, and analyzes — no local setup required.",
   },
   {
-    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>,
     title: "AST-level analysis",
     desc: "Tree-sitter parses your code into an abstract syntax tree — questions reference actual line numbers, not summaries.",
   },
   {
-    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-light)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold-light)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>,
     title: "Personalized study guides",
     desc: "After each session, a scored breakdown maps your weak areas to specific concepts worth reviewing before the real exam.",
   },
   {
-    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>,
     title: "Progress tracking",
     desc: "Historical session scores tracked across runs so you can see which areas have improved — and which need more work.",
   },
   {
-    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
     title: "Objective scoring",
     desc: "The Nemotron reward model evaluates answers against rubrics — not vibes. Scores are reproducible and explainable.",
   },
   {
-    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
     title: "Built-in content safety",
     desc: "Llama Guard 3 runs alongside the examiner, ensuring every generated question stays within appropriate academic scope.",
   },
@@ -125,57 +125,57 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* ── HERO ── */}
-      <section className="section-page relative flex min-h-[100vh] flex-col items-center justify-center px-12 pt-[120px] pb-20">
+      <section className="section-page relative flex min-h-[100vh] flex-col items-center justify-center px-4 pt-[100px] pb-12 md:px-12 md:pt-[120px] md:pb-20">
         <div className="dot-grid" />
         <div className="hero-glow" />
         <div className="relative z-[1] flex flex-col items-center">
 
-        <h1 className="text-center text-[72px] font-[800] leading-[1.05] tracking-[-2.5px] text-ink max-w-[800px] mb-6">
-          Your codebase,<br />
-          <span className="text-primary">interrogated.</span>
-        </h1>
+          <h1 className="text-center text-[36px] font-[800] leading-[1.1] tracking-[-1px] text-ink max-w-[800px] mb-4 md:text-[48px] md:tracking-[-1.5px] md:mb-6 lg:text-[72px] lg:leading-[1.05] lg:tracking-[-2.5px]">
+            Your codebase,<br />
+            <span className="text-primary">interrogated.</span>
+          </h1>
 
-        <p className="text-center text-[18px] text-muted max-w-[520px] leading-[1.7] mb-10">
-          CodeSage analyzes your GitHub repository and generates viva-ready questions that go beyond surface documentation — reaching into architecture, trade-offs, and your actual implementation.
-        </p>
+          <p className="text-center text-[15px] text-muted max-w-[520px] leading-[1.7] mb-8 md:text-[18px] md:mb-10">
+            CodeSage analyzes your GitHub repository and generates viva-ready questions that go beyond surface documentation — reaching into architecture, trade-offs, and your actual implementation.
+          </p>
 
-        <div className="flex items-center gap-3 mb-18">
-          <Link href="/repositories/submit">
-            <Button variant="primary" size="lg" className="gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              Connect repository
-            </Button>
-          </Link>
-          <a href="#demo">
-            <Button variant="secondary" size="lg">
-              See a demo
-            </Button>
-          </a>
-        </div>
-
-        {/* Terminal */}
-        <div className="terminal">
-          <div className="terminal-bar">
-            <span className="tbar-dot r" />
-            <span className="tbar-dot y" />
-            <span className="tbar-dot g" />
-            <span className="tbar-title">codesage — viva session</span>
+          <div className="flex flex-col items-center gap-3 mb-12 sm:flex-row md:mb-18">
+            <Link href="/repositories/submit">
+              <Button variant="primary" size="lg" className="gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg>
+                Connect repository
+              </Button>
+            </Link>
+            <a href="#demo">
+              <Button variant="secondary" size="lg">
+                See a demo
+              </Button>
+            </a>
           </div>
-          <div className="terminal-body">
-            <span className="t-line"><span className="t-prompt">$ </span><span className="t-cmd">codesage analyze</span> <span className="t-output">github.com/you/your-project</span></span>
-            <span className="t-line t-comment">&nbsp;</span>
-            <span className="t-line"><span className="t-output">✦ Cloning repository...</span></span>
-            <span className="t-line"><span className="t-output">✦ Parsing AST with Tree-sitter (</span><span className="t-blue">TypeScript</span><span className="t-output">, </span><span className="t-blue">Python</span><span className="t-output">)...</span></span>
-            <span className="t-line"><span className="t-output">✦ Embedding </span><span className="t-warn">847 code chunks</span><span className="t-output"> via NV-Embed-QA...</span></span>
-            <span className="t-line"><span className="t-output">✦ Generating examination with Llama-3.3-70B...</span></span>
-            <span className="t-line t-comment">&nbsp;</span>
-            <span className="t-line"><span className="t-success">✓ Ready · 12 questions across 4 difficulty levels</span></span>
-            <span className="t-line t-comment">&nbsp;</span>
-            <span className="t-line"><span className="t-prompt">Q1 </span><span className="t-output">Your </span><span className="t-blue">AuthMiddleware</span><span className="t-output"> validates JWT on every route, but your</span></span>
-            <span className="t-line"><span className="t-output">   </span><span className="t-blue">WebSocket</span><span className="t-output"> handler skips it. Was this intentional? What</span></span>
-            <span className="t-line"><span className="t-output">   are the implications for session hijacking? </span><span className="t-cursor" /></span>
+
+          {/* Terminal */}
+          <div className="terminal">
+            <div className="terminal-bar">
+              <span className="tbar-dot r" />
+              <span className="tbar-dot y" />
+              <span className="tbar-dot g" />
+              <span className="tbar-title">codesage — viva session</span>
+            </div>
+            <div className="terminal-body">
+              <span className="t-line"><span className="t-prompt">$ </span><span className="t-cmd">codesage analyze</span> <span className="t-output">github.com/you/your-project</span></span>
+              <span className="t-line t-comment">&nbsp;</span>
+              <span className="t-line"><span className="t-output">✦ Cloning repository...</span></span>
+              <span className="t-line"><span className="t-output">✦ Parsing AST with Tree-sitter (</span><span className="t-blue">TypeScript</span><span className="t-output">, </span><span className="t-blue">Python</span><span className="t-output">)...</span></span>
+              <span className="t-line"><span className="t-output">✦ Embedding </span><span className="t-warn">847 code chunks</span><span className="t-output"> via NV-Embed-QA...</span></span>
+              <span className="t-line"><span className="t-output">✦ Generating examination with Llama-3.3-70B...</span></span>
+              <span className="t-line t-comment">&nbsp;</span>
+              <span className="t-line"><span className="t-success">✓ Ready · 12 questions across 4 difficulty levels</span></span>
+              <span className="t-line t-comment">&nbsp;</span>
+              <span className="t-line"><span className="t-prompt">Q1 </span><span className="t-output">Your </span><span className="t-blue">AuthMiddleware</span><span className="t-output"> validates JWT on every route, but your</span></span>
+              <span className="t-line"><span className="t-output">   </span><span className="t-blue">WebSocket</span><span className="t-output"> handler skips it. Was this intentional? What</span></span>
+              <span className="t-line"><span className="t-output">   are the implications for session hijacking? </span><span className="t-cursor" /></span>
+            </div>
           </div>
-        </div>
         </div>
       </section>
 
@@ -199,7 +199,7 @@ export default function LandingPage() {
                 <div className="mode-desc">{mode.desc}</div>
                 <div className="mode-footer">
                   {mode.footer}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </div>
               </div>
             ))}
@@ -263,8 +263,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pipeline-diagram">
-            <svg viewBox="0 0 1060 180" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", display: "block" }}>
+          <div className="pipeline-diagram overflow-x-auto">
+            <svg viewBox="0 0 1060 180" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", minWidth: "700px", display: "block" }}>
               <defs>
                 <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
                   <path d="M0,0 L0,6 L7,3 z" fill="var(--color-hairline)" />
@@ -400,22 +400,22 @@ export default function LandingPage() {
         <div className="dot-grid dot-grid-subtle" />
         <div className="cta-glow" />
         <div className="relative z-[1]">
-        <h2 className="cta-title">Know your<br /><span className="text-primary">own code.</span></h2>
-        <p className="cta-sub">Connect your repository and start your first viva session in under a minute.</p>
-        <div className="cta-actions">
-          <Link href="/repositories/submit">
-            <Button variant="primary" size="lg" className="gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              Connect your repo
-            </Button>
-          </Link>
-          <a href="https://github.com/DanielDeshmukh/CodeSage" target="_blank" rel="noopener noreferrer">
-            <Button variant="secondary" size="lg" className="gap-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              View on GitHub
-            </Button>
-          </a>
-        </div>
+          <h2 className="cta-title">Know your<br /><span className="text-primary">own code.</span></h2>
+          <p className="cta-sub">Connect your repository and start your first viva session in under a minute.</p>
+          <div className="cta-actions">
+            <Link href="/repositories/submit">
+              <Button variant="primary" size="lg" className="gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg>
+                Connect your repo
+              </Button>
+            </Link>
+            <a href="https://github.com/DanielDeshmukh/CodeSage" target="_blank" rel="noopener noreferrer">
+              <Button variant="secondary" size="lg" className="gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg>
+                View on GitHub
+              </Button>
+            </a>
+          </div>
         </div>
       </section>
     </div>

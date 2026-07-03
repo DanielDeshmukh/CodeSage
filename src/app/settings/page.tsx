@@ -25,7 +25,7 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-ink">Settings</h1>
+        <h1 className="text-2xl font-bold text-ink md:text-3xl">Settings</h1>
         <p className="mt-2 text-muted">
           Configure your CodeSage preferences and API keys
         </p>
@@ -121,7 +121,7 @@ export default function SettingsPage() {
             <CardTitle className="text-lg text-danger">Danger Zone</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-medium text-ink">Reset All Data</p>
                 <p className="text-sm text-muted">

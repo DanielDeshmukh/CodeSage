@@ -69,7 +69,7 @@ export default function StudyGuidePage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-ink">Study Guide</h1>
+        <h1 className="text-2xl font-bold text-ink md:text-3xl">Study Guide</h1>
         <p className="mt-2 text-muted">
           Personalized recommendations based on your exam performance
         </p>

@@ -3,7 +3,7 @@ import Link from "next/link";
 export function Footer() {
   return (
     <footer className="border-t border-hairline-soft bg-canvas-dark">
-      <div className="mx-auto max-w-7xl flex items-center justify-between px-6 lg:px-12 py-5">
+      <div className="mx-auto max-w-7xl flex flex-col items-center gap-3 px-6 py-4 sm:flex-row sm:justify-between sm:px-6 sm:py-5 lg:px-12">
         <div className="flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 28 28" fill="none">
             <path d="M7 14L11 10L14 13L17 9L21 14" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5"/>

@@ -9,7 +9,7 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-canvas-dark p-8">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 h-20 w-20 relative">
+          <div className="mx-auto mb-4 h-16 w-16 relative sm:h-20 sm:w-20 lg:h-24 lg:w-24">
             <Image
               src="/error-logo.png"
               alt="CodeSage"
@@ -24,7 +24,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <div className="rounded-lg border border-hairline bg-surface p-8">
+        <div className="rounded-lg border border-hairline bg-surface p-6 sm:p-8">
           <div className="mb-6 space-y-3">
             <div className="flex items-start gap-3">
               <span className="mt-0.5 text-success">✓</span>

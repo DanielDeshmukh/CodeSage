@@ -4,8 +4,8 @@ import Image from "next/image";
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-canvas-dark p-8">
-      <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-10 text-center">
-        <div className="mx-auto mb-6 h-48 w-48 relative">
+      <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-6 text-center sm:p-8 md:p-10">
+        <div className="mx-auto mb-6 h-24 w-24 relative sm:h-32 sm:w-32 md:h-40 md:w-40 lg:h-48 lg:w-48">
           <Image
             src="/error-logo.png"
             alt="Sage scratching his head in confusion"
@@ -15,7 +15,7 @@ export default function NotFound() {
           />
         </div>
 
-        <div className="mb-4 text-7xl font-bold text-primary">404</div>
+        <div className="mb-4 text-5xl font-bold text-primary sm:text-7xl">404</div>
 
         <h1 className="mb-3 text-2xl font-bold text-ink">
           Seems like we&apos;re lost...

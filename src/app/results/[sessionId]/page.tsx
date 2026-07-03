@@ -73,9 +73,9 @@ export default function ScoreReportPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ink">Score Report</h1>
+          <h1 className="text-2xl font-bold text-ink md:text-3xl">Score Report</h1>
           <p className="mt-2 text-muted">
             {report.repositoryId} • {report.mode} mode
           </p>
@@ -100,7 +100,7 @@ export default function ScoreReportPage() {
               size="lg"
               label="Overall Score"
             />
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
               <ScoreGauge
                 score={report.scores.architecture}
                 size="md"
@@ -145,8 +145,8 @@ export default function ScoreReportPage() {
                 description: "Awareness of performance and scalability considerations",
               },
             ].map((dim) => (
-              <div key={dim.name} className="flex items-center gap-4">
-                <div className="w-32">
+              <div key={dim.name} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                <div className="w-full sm:w-32">
                   <p className="font-medium text-ink">{dim.name}</p>
                   <p className="text-xs text-muted">{dim.description}</p>
                 </div>
@@ -197,7 +197,7 @@ export default function ScoreReportPage() {
                   <div className="flex-1">
                     <p className="font-medium text-ink">{q.question}</p>
                     <p className="mt-1 text-sm text-muted">{q.filePath}</p>
-                    <div className="mt-3 grid grid-cols-3 gap-4">
+                    <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-4">
                       <div>
                         <p className="text-xs text-muted">Accuracy</p>
                         <p

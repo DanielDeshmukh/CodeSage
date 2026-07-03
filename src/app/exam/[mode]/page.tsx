@@ -215,7 +215,7 @@ export default function ExamSessionPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-ink">Exam Session</h1>
           <p className="mt-1 text-muted">
@@ -257,7 +257,7 @@ export default function ExamSessionPage() {
               <CardTitle className="text-lg leading-relaxed">
                 {currentQuestion.question}
               </CardTitle>
-              <div className="mt-3 flex items-center gap-4 text-sm text-muted">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted sm:gap-4">
                 <span className="flex items-center gap-1.5">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -299,13 +299,13 @@ export default function ExamSessionPage() {
             onChange={(e) => setAnswer(e.target.value)}
             className="min-h-[200px]"
           />
-          <div className="mt-4 flex items-center justify-between">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted">
               {answer.length > 0
                 ? `${answer.split(/\s+/).length} words`
                 : "Start typing your answer"}
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button
                 variant="ghost"
                 onClick={handlePrevious}

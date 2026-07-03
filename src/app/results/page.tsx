@@ -55,9 +55,9 @@ export default function ExamHistoryPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <div className="mb-8 flex items-start justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ink">Exam History</h1>
+          <h1 className="text-2xl font-bold text-ink md:text-3xl">Exam History</h1>
           <p className="mt-2 text-muted">
             View your past examination sessions and performance trends
           </p>

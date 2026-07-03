@@ -8,6 +8,11 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isAuthenticated = !!req.auth;
 
+  // Skip auth in E2E test mode
+  if (process.env.E2E_TEST === "true") {
+    return NextResponse.next();
+  }
+
   // Redirect authenticated users away from auth pages
   if (authRoutes.some((route) => pathname.startsWith(route))) {
     if (isAuthenticated) {
