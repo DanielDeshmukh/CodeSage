@@ -11,22 +11,39 @@ interface ReportData {
   sessionId: string;
   repositoryId: string;
   mode: string;
-  completedAt: string;
   scores: {
     overall: number;
-    architecture: number;
-    codeDetail: number;
-    scalability: number;
+    dimensions: {
+      accuracy: number;
+      completeness: number;
+      clarity: number;
+      depth: number;
+    };
   };
-  questionBreakdown: {
-    id: string;
-    question: string;
-    filePath: string;
-    accuracy: number;
-    depth: number;
-    awareness: number;
+  radarData: Array<{
+    dimension: string;
+    score: number;
+    fullMark: number;
+  }>;
+  questionBreakdown: Array<{
+    questionId: string;
+    questionNumber: number;
+    score: number;
+    maxScore: number;
+    percentage: number;
     feedback: string;
-  }[];
+  }>;
+  performanceSummary: {
+    grade: string;
+    percentile: string;
+    strengths: string[];
+    weaknesses: string[];
+  };
+  metadata: {
+    generatedAt: string;
+    totalTimeMs: number;
+    questionsAnswered: number;
+  };
 }
 
 export default function ScoreReportPage() {
@@ -70,6 +87,8 @@ export default function ScoreReportPage() {
     );
   }
 
+  const dims = report.scores.dimensions;
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       {/* Header */}
@@ -80,14 +99,16 @@ export default function ScoreReportPage() {
             {report.repositoryId} • {report.mode} mode
           </p>
           <p className="text-sm text-muted">
-            Completed on {new Date(report.completedAt).toLocaleDateString()}
+            Grade: {report.performanceSummary.grade} • {report.performanceSummary.percentile}
           </p>
         </div>
         <div className="flex gap-3">
           <Link href="/results">
             <Button variant="ghost">View All Reports</Button>
           </Link>
-          <Button variant="primary">Export PDF</Button>
+          <Link href={`/exam/select?repo=${report.repositoryId}`}>
+            <Button variant="primary">Retake Exam</Button>
+          </Link>
         </div>
       </div>
 
@@ -100,22 +121,11 @@ export default function ScoreReportPage() {
               size="lg"
               label="Overall Score"
             />
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-              <ScoreGauge
-                score={report.scores.architecture}
-                size="md"
-                label="Architecture"
-              />
-              <ScoreGauge
-                score={report.scores.codeDetail}
-                size="md"
-                label="Code Detail"
-              />
-              <ScoreGauge
-                score={report.scores.scalability}
-                size="md"
-                label="Scalability"
-              />
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              <ScoreGauge score={dims.accuracy} size="md" label="Accuracy" />
+              <ScoreGauge score={dims.completeness} size="md" label="Completeness" />
+              <ScoreGauge score={dims.clarity} size="md" label="Clarity" />
+              <ScoreGauge score={dims.depth} size="md" label="Depth" />
             </div>
           </div>
         </CardContent>
@@ -130,19 +140,24 @@ export default function ScoreReportPage() {
           <div className="space-y-6">
             {[
               {
-                name: "Architecture",
-                score: report.scores.architecture,
-                description: "Understanding of system design and architectural decisions",
+                name: "Accuracy",
+                score: dims.accuracy,
+                description: "Technical correctness of your answers",
               },
               {
-                name: "Code Detail",
-                score: report.scores.codeDetail,
-                description: "Knowledge of implementation details and algorithms",
+                name: "Completeness",
+                score: dims.completeness,
+                description: "How thoroughly you covered the topics",
               },
               {
-                name: "Scalability",
-                score: report.scores.scalability,
-                description: "Awareness of performance and scalability considerations",
+                name: "Clarity",
+                score: dims.clarity,
+                description: "Quality of communication and explanation",
+              },
+              {
+                name: "Depth",
+                score: dims.depth,
+                description: "Depth of understanding demonstrated",
               },
             ].map((dim) => (
               <div key={dim.name} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -181,6 +196,43 @@ export default function ScoreReportPage() {
         </CardContent>
       </Card>
 
+      {/* Strengths & Weaknesses */}
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Card variant="dark">
+          <CardHeader>
+            <CardTitle className="text-lg text-success">Strengths</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {report.performanceSummary.strengths.map((s, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-ink">
+                  <span className="mt-0.5 text-success">+</span>
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+        <Card variant="dark">
+          <CardHeader>
+            <CardTitle className="text-lg text-danger">Areas for Improvement</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {report.performanceSummary.weaknesses.map((w, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-ink">
+                  <span className="mt-0.5 text-danger">-</span>
+                  {w}
+                </li>
+              ))}
+              {report.performanceSummary.weaknesses.length === 0 && (
+                <li className="text-sm text-muted">No significant weaknesses detected</li>
+              )}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Question Breakdown */}
       <Card variant="dark" className="mb-8">
         <CardHeader>
@@ -188,60 +240,28 @@ export default function ScoreReportPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {report.questionBreakdown.map((q, i) => (
-              <div key={q.id} className="rounded-lg border border-hairline p-4">
+            {report.questionBreakdown.map((q) => (
+              <div key={q.questionId} className="rounded-lg border border-hairline p-4">
                 <div className="flex items-start gap-4">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-ink">
-                    {i + 1}
+                    {q.questionNumber}
                   </span>
                   <div className="flex-1">
-                    <p className="font-medium text-ink">{q.question}</p>
-                    <p className="mt-1 text-sm text-muted">{q.filePath}</p>
-                    <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-4">
-                      <div>
-                        <p className="text-xs text-muted">Accuracy</p>
-                        <p
-                          className={`text-sm font-bold ${
-                            q.accuracy >= 80
-                              ? "text-success"
-                              : q.accuracy >= 60
-                                ? "text-primary"
-                                : "text-danger"
-                          }`}
-                        >
-                          {q.accuracy}%
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted">Depth</p>
-                        <p
-                          className={`text-sm font-bold ${
-                            q.depth >= 80
-                              ? "text-success"
-                              : q.depth >= 60
-                                ? "text-primary"
-                                : "text-danger"
-                          }`}
-                        >
-                          {q.depth}%
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted">Awareness</p>
-                        <p
-                          className={`text-sm font-bold ${
-                            q.awareness >= 80
-                              ? "text-success"
-                              : q.awareness >= 60
-                                ? "text-primary"
-                                : "text-danger"
-                          }`}
-                        >
-                          {q.awareness}%
-                        </p>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <p className="font-medium text-ink">Question {q.questionNumber}</p>
+                      <span
+                        className={`text-sm font-bold ${
+                          q.percentage >= 80
+                            ? "text-success"
+                            : q.percentage >= 60
+                              ? "text-primary"
+                              : "text-danger"
+                        }`}
+                      >
+                        {q.score}/{q.maxScore} ({q.percentage}%)
+                      </span>
                     </div>
-                    <p className="mt-3 text-sm text-muted">{q.feedback}</p>
+                    <p className="mt-2 text-sm text-muted">{q.feedback}</p>
                   </div>
                 </div>
               </div>
@@ -250,12 +270,15 @@ export default function ScoreReportPage() {
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-3">
-        <Link href="/exam">
-          <Button variant="primary">Take Another Exam</Button>
-        </Link>
-      </div>
+      {/* Metadata */}
+      <Card variant="dark">
+        <CardContent className="p-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted">
+            <span>Generated: {new Date(report.metadata.generatedAt).toLocaleString()}</span>
+            <span>Questions answered: {report.metadata.questionsAnswered}</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
