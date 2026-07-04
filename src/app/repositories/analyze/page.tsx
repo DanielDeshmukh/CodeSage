@@ -18,10 +18,11 @@ interface AnalysisResult {
   success: boolean;
   repositoryId: string;
   stats: {
-    files: number;
-    chunks: number;
-    lines: number;
-    languages: string[];
+    totalFiles: number;
+    safeFiles: number;
+    unsafeFiles: number;
+    languages: Record<string, number>;
+    totalSize: number;
   };
   error?: string;
   durationMs?: number;
@@ -71,7 +72,7 @@ function AnalysisContent() {
           setResult({
             success: false,
             repositoryId: "",
-            stats: { files: 0, chunks: 0, lines: 0, languages: [] },
+            stats: { totalFiles: 0, safeFiles: 0, unsafeFiles: 0, languages: {}, totalSize: 0 },
             error: err instanceof Error ? err.message : "An unexpected error occurred",
           });
         }
@@ -181,22 +182,22 @@ function AnalysisContent() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{result.stats.files}</p>
-                <p className="text-sm text-muted">Files</p>
+                <p className="text-2xl font-bold text-primary">{result.stats.totalFiles}</p>
+                <p className="text-sm text-muted">Total Files</p>
               </div>
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
-                <p className="text-2xl font-bold text-primary">{result.stats.chunks}</p>
-                <p className="text-sm text-muted">Chunks</p>
+                <p className="text-2xl font-bold text-primary">{result.stats.safeFiles}</p>
+                <p className="text-sm text-muted">Safe Files</p>
               </div>
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
                 <p className="text-2xl font-bold text-primary">
-                  {result.stats.lines.toLocaleString()}
+                  {result.stats.totalSize.toLocaleString()} B
                 </p>
-                <p className="text-sm text-muted">Lines</p>
+                <p className="text-sm text-muted">Total Size</p>
               </div>
               <div className="rounded-lg bg-surface-elevated p-4 text-center">
                 <p className="text-2xl font-bold text-primary">
-                  {result.stats.languages.length}
+                  {Object.keys(result.stats.languages).length}
                 </p>
                 <p className="text-sm text-muted">Languages</p>
               </div>
@@ -205,12 +206,12 @@ function AnalysisContent() {
             <div className="mt-6">
               <p className="text-sm font-medium text-ink">Languages Detected</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {result.stats.languages.map((lang) => (
+                {Object.entries(result.stats.languages).map(([lang, count]) => (
                   <span
                     key={lang}
                     className="rounded-full bg-surface px-3 py-1 text-xs text-muted"
                   >
-                    {lang}
+                    {lang} ({count})
                   </span>
                 ))}
               </div>
