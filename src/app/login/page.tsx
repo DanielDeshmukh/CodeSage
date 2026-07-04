@@ -15,9 +15,9 @@ function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-canvas-dark p-8">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 h-16 w-16 relative sm:h-20 sm:w-20 lg:h-24 lg:w-24">
+          <div className="mx-auto mb-4 w-24 h-24 relative sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36">
             <Image
-              src="/error-logo.png"
+              src="/sage-logo.png"
               alt="CodeSage"
               fill
               className="object-contain"

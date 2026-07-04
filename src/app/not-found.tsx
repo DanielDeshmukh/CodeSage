@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-canvas-dark p-8">
       <div className="w-full max-w-lg rounded-lg border border-hairline bg-surface p-6 text-center sm:p-8 md:p-10">
-        <div className="mx-auto mb-6 h-24 w-24 relative sm:h-32 sm:w-32 md:h-40 md:w-40 lg:h-48 lg:w-48">
+        <div className="mx-auto mb-6 w-24 h-24 relative sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
           <Image
             src="/error-logo.png"
             alt="Sage scratching his head in confusion"
