@@ -92,17 +92,17 @@ export default function DashboardPage() {
     );
   }
 
+  const completedExams = exams.filter(
+    (e) => e.status === "completed" && e.maxTotalScore > 0
+  );
   const averageScore =
-    exams.length > 0
-      ? Math.round(exams.filter((e) => e.answers.length > 0).length > 0
-          ? exams.reduce((sum, e) => {
-              const score =
-                e.answers.length > 0
-                  ? Math.round((e.answers.length / e.questions.length) * 100)
-                  : 0;
-              return sum + score;
-            }, 0) / exams.filter((e) => e.answers.length > 0).length
-          : 0)
+    completedExams.length > 0
+      ? Math.round(
+          completedExams.reduce(
+            (sum, e) => sum + Math.round((e.totalScore / e.maxTotalScore) * 100),
+            0
+          ) / completedExams.length
+        )
       : 0;
 
   const totalChunks = repositories.reduce((sum, r) => {
@@ -225,8 +225,8 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {exams.map((exam) => {
                   const score =
-                    exam.questions.length > 0
-                      ? Math.round((exam.answers.length / exam.questions.length) * 100)
+                    exam.maxTotalScore > 0
+                      ? Math.round((exam.totalScore / exam.maxTotalScore) * 100)
                       : 0;
                   return (
                     <div
