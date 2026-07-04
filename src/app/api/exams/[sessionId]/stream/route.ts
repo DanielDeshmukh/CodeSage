@@ -31,7 +31,7 @@ export async function GET(
         });
 
         // Get initial status
-        const status = examLoop.getExamStatus(sessionId);
+        const status = await examLoop.getExamStatus(sessionId);
         if (status) {
           sendEvent({ type: "status", data: status });
         }

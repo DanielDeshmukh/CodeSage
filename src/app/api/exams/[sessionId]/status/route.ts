@@ -9,7 +9,7 @@ export async function GET(
     const { sessionId } = await params;
 
     const examLoop = getExamLoop();
-    const status = examLoop.getExamStatus(sessionId);
+    const status = await examLoop.getExamStatus(sessionId);
 
     if (!status) {
       return NextResponse.json(

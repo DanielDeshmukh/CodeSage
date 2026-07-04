@@ -1,3 +1,10 @@
+import {
+  getExam,
+  addExam,
+  updateExam,
+  type ExamRecord,
+} from "@/lib/exam-store";
+
 export type ExamMode = "viva" | "interview" | "code-review";
 export type ExamStatus = "pending" | "active" | "paused" | "completed" | "cancelled";
 export type Difficulty = "beginner" | "intermediate" | "advanced";
@@ -56,136 +63,157 @@ export interface ExamSession {
   elapsedMs: number;
 }
 
-export class ExamSessionManager {
-  private sessions = new Map<string, ExamSession>();
+function recordToSession(record: ExamRecord): ExamSession {
+  return {
+    id: record.id,
+    repositoryId: record.repositoryId,
+    mode: record.mode as ExamMode,
+    difficulty: record.difficulty as Difficulty,
+    status: record.status as ExamStatus,
+    questions: (record.questions || []) as ExamQuestion[],
+    answers: (record.answers || []) as ExamAnswer[],
+    evaluations: (record.evaluations || []) as ExamEvaluation[],
+    currentQuestionIndex: (record.answers || []).length,
+    startedAt: record.startedAt ? new Date(record.startedAt) : null,
+    completedAt: record.completedAt ? new Date(record.completedAt) : null,
+    totalScore: record.totalScore || 0,
+    maxTotalScore: record.maxTotalScore || 0,
+    timeLimitMs: 1800000,
+    elapsedMs: 0,
+  };
+}
 
-  createSession(
+function sessionToRecord(session: ExamSession): ExamRecord {
+  return {
+    id: session.id,
+    repositoryId: session.repositoryId,
+    mode: session.mode,
+    difficulty: session.difficulty,
+    status: session.status,
+    totalScore: session.totalScore,
+    maxTotalScore: session.maxTotalScore,
+    questions: session.questions,
+    answers: session.answers,
+    evaluations: session.evaluations,
+    startedAt: session.startedAt?.toISOString() || new Date().toISOString(),
+    completedAt: session.completedAt?.toISOString() || null,
+  };
+}
+
+export class ExamSessionManager {
+  async createSession(
     id: string,
     repositoryId: string,
     mode: ExamMode,
     difficulty: Difficulty = "intermediate",
     timeLimitMs: number = 1800000
-  ): ExamSession {
-    const session: ExamSession = {
+  ): Promise<ExamSession> {
+    const record: ExamRecord = {
       id,
       repositoryId,
       mode,
       difficulty,
       status: "pending",
+      totalScore: 0,
+      maxTotalScore: 0,
       questions: [],
       answers: [],
       evaluations: [],
-      currentQuestionIndex: 0,
-      startedAt: null,
+      startedAt: new Date().toISOString(),
       completedAt: null,
-      totalScore: 0,
-      maxTotalScore: 0,
-      timeLimitMs,
-      elapsedMs: 0,
     };
 
-    this.sessions.set(id, session);
-    return session;
+    await addExam(record);
+    return recordToSession(record);
   }
 
-  getSession(id: string): ExamSession | null {
-    return this.sessions.get(id) || null;
+  async getSession(id: string): Promise<ExamSession | null> {
+    const record = await getExam(id);
+    return record ? recordToSession(record) : null;
   }
 
-  startSession(id: string): ExamSession | null {
-    const session = this.sessions.get(id);
-    if (!session) return null;
-
-    session.status = "active";
-    session.startedAt = new Date();
-    return session;
+  async startSession(id: string): Promise<ExamSession | null> {
+    await updateExam(id, { status: "active", startedAt: new Date().toISOString() });
+    return this.getSession(id);
   }
 
-  pauseSession(id: string): ExamSession | null {
-    const session = this.sessions.get(id);
-    if (!session || session.status !== "active") return null;
-
-    session.status = "paused";
-    session.elapsedMs += Date.now() - (session.startedAt?.getTime() || 0);
-    return session;
+  async pauseSession(id: string): Promise<ExamSession | null> {
+    await updateExam(id, { status: "paused" });
+    return this.getSession(id);
   }
 
-  resumeSession(id: string): ExamSession | null {
-    const session = this.sessions.get(id);
-    if (!session || session.status !== "paused") return null;
-
-    session.status = "active";
-    session.startedAt = new Date();
-    return session;
+  async resumeSession(id: string): Promise<ExamSession | null> {
+    await updateExam(id, { status: "active" });
+    return this.getSession(id);
   }
 
-  completeSession(id: string): ExamSession | null {
-    const session = this.sessions.get(id);
-    if (!session) return null;
+  async completeSession(id: string): Promise<ExamSession | null> {
+    const record = await getExam(id);
+    if (!record) return null;
 
-    session.status = "completed";
-    session.completedAt = new Date();
-    if (session.startedAt) {
-      session.elapsedMs += Date.now() - session.startedAt.getTime();
-    }
+    const evaluations = (record.evaluations || []) as ExamEvaluation[];
+    const totalScore = evaluations.reduce((sum, e) => sum + e.score, 0);
+    const maxTotalScore = evaluations.reduce((sum, e) => sum + e.maxScore, 0);
 
-    // Calculate total score
-    session.totalScore = session.evaluations.reduce((sum, e) => sum + e.score, 0);
-    session.maxTotalScore = session.evaluations.reduce((sum, e) => sum + e.maxScore, 0);
+    await updateExam(id, {
+      status: "completed",
+      completedAt: new Date().toISOString(),
+      totalScore,
+      maxTotalScore,
+    });
 
-    return session;
+    return this.getSession(id);
   }
 
-  cancelSession(id: string): ExamSession | null {
-    const session = this.sessions.get(id);
-    if (!session) return null;
-
-    session.status = "cancelled";
-    session.completedAt = new Date();
-    return session;
+  async cancelSession(id: string): Promise<ExamSession | null> {
+    await updateExam(id, { status: "cancelled", completedAt: new Date().toISOString() });
+    return this.getSession(id);
   }
 
-  addQuestion(id: string, question: ExamQuestion): ExamSession | null {
-    const session = this.sessions.get(id);
+  async addQuestion(id: string, question: ExamQuestion): Promise<ExamSession | null> {
+    const session = await this.getSession(id);
     if (!session) return null;
 
     session.questions.push(question);
+    await updateExam(id, { questions: session.questions });
     return session;
   }
 
-  addAnswer(id: string, answer: ExamAnswer): ExamSession | null {
-    const session = this.sessions.get(id);
+  async addAnswer(id: string, answer: ExamAnswer): Promise<ExamSession | null> {
+    const session = await this.getSession(id);
     if (!session) return null;
 
     session.answers.push(answer);
     session.currentQuestionIndex++;
+    await updateExam(id, { answers: session.answers });
     return session;
   }
 
-  addEvaluation(id: string, evaluation: ExamEvaluation): ExamSession | null {
-    const session = this.sessions.get(id);
+  async addEvaluation(id: string, evaluation: ExamEvaluation): Promise<ExamSession | null> {
+    const session = await this.getSession(id);
     if (!session) return null;
 
     session.evaluations.push(evaluation);
+    await updateExam(id, { evaluations: session.evaluations });
     return session;
   }
 
-  getCurrentQuestion(id: string): ExamQuestion | null {
-    const session = this.sessions.get(id);
+  async getCurrentQuestion(id: string): Promise<ExamQuestion | null> {
+    const session = await this.getSession(id);
     if (!session || session.currentQuestionIndex >= session.questions.length) {
       return null;
     }
     return session.questions[session.currentQuestionIndex];
   }
 
-  getProgress(id: string): {
+  async getProgress(id: string): Promise<{
     current: number;
     total: number;
     percentage: number;
     score: number;
     maxScore: number;
-  } | null {
-    const session = this.sessions.get(id);
+  } | null> {
+    const session = await this.getSession(id);
     if (!session) return null;
 
     const total = session.questions.length;
@@ -202,14 +230,11 @@ export class ExamSessionManager {
     };
   }
 
-  getSessionsByRepository(repositoryId: string): ExamSession[] {
-    return Array.from(this.sessions.values()).filter(
-      (s) => s.repositoryId === repositoryId
-    );
-  }
-
-  deleteSession(id: string): boolean {
-    return this.sessions.delete(id);
+  async deleteSession(id: string): Promise<boolean> {
+    const session = await this.getSession(id);
+    if (!session) return false;
+    await updateExam(id, { status: "cancelled" });
+    return true;
   }
 }
 

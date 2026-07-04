@@ -62,7 +62,7 @@ export class ExamLoop {
 
   async startExam(options: ExamLoopOptions): Promise<ExamSession> {
     const sessionId = uuidv4();
-    const session = this.sessionManager.createSession(
+    const session = await this.sessionManager.createSession(
       sessionId,
       options.repositoryId,
       options.mode,
@@ -81,13 +81,13 @@ export class ExamLoop {
     );
 
     for (const question of questions) {
-      this.sessionManager.addQuestion(sessionId, question);
+      await this.sessionManager.addQuestion(sessionId, question);
     }
 
     // Start the session
-    this.sessionManager.startSession(sessionId);
+    await this.sessionManager.startSession(sessionId);
 
-    return this.sessionManager.getSession(sessionId)!;
+    return (await this.sessionManager.getSession(sessionId))!;
   }
 
   async submitAnswer(
@@ -98,7 +98,7 @@ export class ExamLoop {
     followUp: ExamQuestion | null;
     isComplete: boolean;
   }> {
-    const session = this.sessionManager.getSession(sessionId);
+    const session = await this.sessionManager.getSession(sessionId);
     if (!session) {
       throw new Error("Session not found");
     }
@@ -133,7 +133,7 @@ export class ExamLoop {
       timestamp: new Date(),
       timeSpentMs: 0,
     };
-    this.sessionManager.addAnswer(sessionId, answerRecord);
+    await this.sessionManager.addAnswer(sessionId, answerRecord);
 
     // Evaluate answer
     const evaluation = await this.answerEvaluator.evaluate({
@@ -148,7 +148,7 @@ export class ExamLoop {
       },
     });
 
-    this.sessionManager.addEvaluation(sessionId, evaluation);
+    await this.sessionManager.addEvaluation(sessionId, evaluation);
     this.onEvaluation?.(evaluation);
 
     // Check if should generate follow-up
@@ -180,15 +180,16 @@ export class ExamLoop {
     }
 
     // Check if exam is complete
+    const updatedSession = await this.sessionManager.getSession(sessionId);
     const isComplete =
-      session.currentQuestionIndex >= session.questions.length;
+      (updatedSession?.currentQuestionIndex || 0) >= (updatedSession?.questions.length || 0);
 
     if (isComplete) {
-      this.sessionManager.completeSession(sessionId);
+      await this.sessionManager.completeSession(sessionId);
     }
 
     // Report progress
-    const progress = this.sessionManager.getProgress(sessionId);
+    const progress = await this.sessionManager.getProgress(sessionId);
     if (progress) {
       this.onProgress?.({
         current: progress.current,
@@ -201,7 +202,7 @@ export class ExamLoop {
   }
 
   async completeExam(sessionId: string): Promise<ExamLoopResult> {
-    const session = this.sessionManager.getSession(sessionId);
+    const session = await this.sessionManager.getSession(sessionId);
     if (!session) {
       throw new Error("Session not found");
     }
@@ -217,23 +218,26 @@ export class ExamLoop {
     const { overall, dimensions } =
       this.answerEvaluator.calculateOverallScore(session.evaluations);
 
+    // Mark as completed
+    await this.sessionManager.completeSession(sessionId);
+
     return {
-      session,
+      session: (await this.sessionManager.getSession(sessionId))!,
       feedback,
       overallScore: overall,
       dimensionScores: dimensions,
     };
   }
 
-  getExamStatus(sessionId: string): {
+  async getExamStatus(sessionId: string): Promise<{
     progress: number;
     score: number;
     timeRemaining: number;
-  } | null {
-    const session = this.sessionManager.getSession(sessionId);
+  } | null> {
+    const session = await this.sessionManager.getSession(sessionId);
     if (!session) return null;
 
-    const progress = this.sessionManager.getProgress(sessionId);
+    const progress = await this.sessionManager.getProgress(sessionId);
     if (!progress) return null;
 
     const elapsed = session.elapsedMs;
