@@ -19,11 +19,15 @@ export function Header() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!mobileOpen) return;
     function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (
+        menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        toggleRef.current && !toggleRef.current.contains(e.target as Node)
+      ) {
         setMobileOpen(false);
       }
     }
@@ -135,6 +139,7 @@ export function Header() {
 
           {/* Mobile hamburger */}
           <button
+            ref={toggleRef}
             className="md:hidden flex items-center justify-center w-8 h-8 rounded-md text-muted hover:text-ink hover:bg-surface-card transition-colors ml-1"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
