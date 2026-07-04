@@ -82,11 +82,18 @@ export class IngestionOrchestrator {
         repoUrl: repoInfo.cloneUrl,
         targetDir: repoId,
         depth: 1,
+        budget: 500,
       });
 
       if (!cloneResult.success) {
         throw new Error(`Clone failed: ${cloneResult.error}`);
       }
+
+      this.reportProgress({
+        stage: "cloning",
+        message: `Downloaded ${cloneResult.filesDownloaded} of ${cloneResult.filesPrioritized} files (prioritized)`,
+        progress: 25,
+      });
 
       // Stage 3: Walk files
       this.reportProgress({
@@ -135,7 +142,7 @@ export class IngestionOrchestrator {
       });
 
       const filesWithContent = await Promise.all(
-        files.slice(0, 100).map(async (file) => {
+        files.slice(0, 200).map(async (file) => {
           try {
             const content = await readFile(file.path, "utf-8");
             return {

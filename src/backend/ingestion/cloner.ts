@@ -1,16 +1,20 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
+import { prioritizeFiles, type FileToPrioritize } from "./prioritizer";
 
 export interface CloneOptions {
   repoUrl: string;
   targetDir: string;
   depth?: number;
   branch?: string;
+  budget?: number; // max files to download (default 500)
 }
 
 export interface CloneResult {
   success: boolean;
   path: string;
+  filesDownloaded: number;
+  filesPrioritized: number;
   error?: string;
   durationMs: number;
 }
@@ -136,18 +140,31 @@ export class RepositoryCloner {
       // Filter to source files only
       const sourceFiles = entries.filter((e) => !shouldSkipFile(e.path));
 
-      // Download and write files (limit to 500 files for serverless)
-      const filesToFetch = sourceFiles.slice(0, 500);
+      // Smart prioritization: rank by importance, not just first-N
+      const budget = options.budget ?? 500;
+      const toPrioritize: FileToPrioritize[] = sourceFiles.map((e) => ({
+        path: e.path,
+        relativePath: e.path,
+        extension: "." + e.path.split(".").pop()?.toLowerCase(),
+        size: e.size ?? 0,
+        sha: e.sha,
+      }));
+      const prioritized = prioritizeFiles(toPrioritize, budget);
+
+      // Download prioritized files
+      const filesToFetch = prioritized;
 
       await Promise.all(
         filesToFetch.map(async (entry) => {
           try {
+            const sha = (entry as FileToPrioritize & { sha?: string }).sha;
+            if (!sha) return;
             const content = await getFileContent(
               parsed.owner,
               parsed.repo,
-              entry.sha
+              sha
             );
-            const filePath = join(targetPath, entry.path);
+            const filePath = join(targetPath, entry.relativePath);
             mkdirSync(dirname(filePath), { recursive: true });
             writeFileSync(filePath, content, "utf-8");
           } catch {
@@ -159,12 +176,16 @@ export class RepositoryCloner {
       return {
         success: true,
         path: targetPath,
+        filesDownloaded: filesToFetch.length,
+        filesPrioritized: sourceFiles.length,
         durationMs: Date.now() - startTime,
       };
     } catch (error) {
       return {
         success: false,
         path: targetPath,
+        filesDownloaded: 0,
+        filesPrioritized: 0,
         error: error instanceof Error ? error.message : "Clone failed",
         durationMs: Date.now() - startTime,
       };
