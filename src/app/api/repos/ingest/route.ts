@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Persist repo so it appears in GET /api/repos
     if (result.success && result.repositoryId) {
       const name = repoUrl.split("/").slice(-2).join("/");
-      addRepo({
+      await addRepo({
         id: result.repositoryId,
         name,
         url: repoUrl,

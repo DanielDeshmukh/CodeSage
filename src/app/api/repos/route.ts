@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRepos, addRepo } from "@/lib/repo-store";
 
 export async function GET() {
-  return NextResponse.json({ repositories: getRepos() });
+  const repositories = await getRepos();
+  return NextResponse.json({ repositories });
 }
 
 export async function POST(request: NextRequest) {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    addRepo(repo);
+    await addRepo(repo);
     return NextResponse.json({ repository: repo }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
