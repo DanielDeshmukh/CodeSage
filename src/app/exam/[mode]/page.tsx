@@ -10,11 +10,14 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 interface Question {
   id: string;
   question: string;
-  filePath: string;
-  functionName: string;
-  lineNumber: number;
-  language: string;
-  codeContext: string;
+  type: "conceptual" | "implementation" | "architectural" | "debugging";
+  difficulty: "easy" | "medium" | "hard";
+  context: {
+    filePath: string;
+    language: string;
+    chunkName: string;
+  };
+  expectedPoints: string[];
 }
 
 interface ExamSession {
@@ -27,11 +30,12 @@ interface ExamSession {
 interface Evaluation {
   score: number;
   feedback: string;
+  dimensionScores?: Record<string, number>;
 }
 
 interface AnswerResponse {
   evaluation: Evaluation;
-  followUp: string | null;
+  followUp: Question | null;
   isComplete: boolean;
 }
 
@@ -52,9 +56,10 @@ export default function ExamSessionPage() {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [lastEvaluation, setLastEvaluation] = useState<Evaluation | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [followUpQuestion, setFollowUpQuestion] = useState<Question | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const currentQuestion = session?.questions[currentQuestionIndex] || null;
+  const currentQuestion = followUpQuestion || session?.questions[currentQuestionIndex] || null;
 
   const startExam = useCallback(async () => {
     if (!repositoryId) {
@@ -113,7 +118,7 @@ export default function ExamSessionPage() {
   }, [session, router]);
 
   const submitAnswer = useCallback(async () => {
-    if (!session || !answer.trim()) return;
+    if (!session || !answer.trim() || !currentQuestion) return;
 
     try {
       setIsSubmitting(true);
@@ -131,8 +136,19 @@ export default function ExamSessionPage() {
 
       const data: AnswerResponse = await response.json();
       setLastEvaluation(data.evaluation);
-      setAnswers((prev) => ({ ...prev, [currentQuestion!.id]: answer }));
+      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: answer }));
       setAnswer("");
+
+      // Handle follow-up question
+      if (data.followUp) {
+        setFollowUpQuestion(data.followUp);
+      } else {
+        setFollowUpQuestion(null);
+        // Auto-advance to next question
+        if (!data.isComplete && currentQuestionIndex < session.questions.length - 1) {
+          setCurrentQuestionIndex((prev) => prev + 1);
+        }
+      }
 
       if (data.isComplete) {
         await completeSession();
@@ -142,7 +158,7 @@ export default function ExamSessionPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [session, answer, currentQuestion, completeSession]);
+  }, [session, answer, currentQuestion, currentQuestionIndex, completeSession]);
 
   const handleNext = () => {
     if (!session) return;
@@ -150,6 +166,7 @@ export default function ExamSessionPage() {
       setCurrentQuestionIndex((prev) => prev + 1);
       setAnswer(answers[session.questions[currentQuestionIndex + 1]?.id] || "");
       setLastEvaluation(null);
+      setFollowUpQuestion(null);
     }
   };
 
@@ -158,6 +175,7 @@ export default function ExamSessionPage() {
       setCurrentQuestionIndex((prev) => prev - 1);
       setAnswer(answers[session!.questions[currentQuestionIndex - 1]?.id] || "");
       setLastEvaluation(null);
+      setFollowUpQuestion(null);
     }
   };
 
@@ -198,8 +216,8 @@ export default function ExamSessionPage() {
           </svg>
           <p className="mt-4 text-lg font-medium text-ink">Error</p>
           <p className="mt-2 text-muted">{error}</p>
-          <Button variant="primary" className="mt-6" onClick={() => router.push("/exams")}>
-            Return to Exams
+          <Button variant="primary" className="mt-6" onClick={() => router.push("/exam/select")}>
+            Return to Exam Selection
           </Button>
         </div>
       </div>
@@ -212,6 +230,20 @@ export default function ExamSessionPage() {
 
   const totalQuestions = session.questions.length;
   const answeredCount = Object.keys(answers).length;
+  const isFollowUp = followUpQuestion !== null;
+
+  const difficultyColors = {
+    easy: "text-success",
+    medium: "text-primary",
+    hard: "text-danger",
+  };
+
+  const typeLabels = {
+    conceptual: "Conceptual",
+    implementation: "Implementation",
+    architectural: "Architectural",
+    debugging: "Debugging",
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -220,6 +252,7 @@ export default function ExamSessionPage() {
           <h1 className="text-2xl font-bold text-ink">Exam Session</h1>
           <p className="mt-1 text-muted">
             Question {currentQuestionIndex + 1} of {totalQuestions}
+            {isFollowUp && " (Follow-up)"}
           </p>
         </div>
         <div className="flex items-center gap-6">
@@ -262,26 +295,33 @@ export default function ExamSessionPage() {
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  {currentQuestion.filePath}
+                  {currentQuestion.context.filePath}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                   </svg>
-                  {currentQuestion.functionName}
+                  {currentQuestion.context.chunkName}
                 </span>
-                <span>Line {currentQuestion.lineNumber}</span>
+                <span className={`font-medium ${difficultyColors[currentQuestion.difficulty]}`}>
+                  {currentQuestion.difficulty}
+                </span>
+                <span className="rounded bg-surface-elevated px-2 py-0.5 text-xs">
+                  {typeLabels[currentQuestion.type]}
+                </span>
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {currentQuestion.codeContext && (
+          {currentQuestion.expectedPoints.length > 0 && (
             <div className="rounded-lg bg-surface-elevated p-4">
-              <p className="text-xs font-medium text-muted mb-2">Code Context</p>
-              <pre className="font-mono text-sm text-body overflow-x-auto">
-                {currentQuestion.codeContext}
-              </pre>
+              <p className="text-xs font-medium text-muted mb-2">Expected Points</p>
+              <ul className="list-disc list-inside text-sm text-body space-y-1">
+                {currentQuestion.expectedPoints.map((point, i) => (
+                  <li key={i}>{point}</li>
+                ))}
+              </ul>
             </div>
           )}
         </CardContent>
@@ -306,27 +346,31 @@ export default function ExamSessionPage() {
                 : "Start typing your answer"}
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button
-                variant="ghost"
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={handleNext}
-                disabled={currentQuestionIndex === totalQuestions - 1}
-              >
-                Skip
-              </Button>
+              {!isFollowUp && (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={handlePrevious}
+                    disabled={currentQuestionIndex === 0}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={handleNext}
+                    disabled={currentQuestionIndex === totalQuestions - 1}
+                  >
+                    Skip
+                  </Button>
+                </>
+              )}
               <Button
                 variant="primary"
                 disabled={!answer.trim()}
                 isLoading={isSubmitting}
                 onClick={submitAnswer}
               >
-                Submit Answer
+                {isFollowUp ? "Submit Follow-up" : "Submit Answer"}
               </Button>
             </div>
           </div>
@@ -344,6 +388,18 @@ export default function ExamSessionPage() {
               <span className="font-bold text-ink">{lastEvaluation.score}/100</span>
             </div>
             <p className="text-body">{lastEvaluation.feedback}</p>
+            {lastEvaluation.dimensionScores && (
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {Object.entries(lastEvaluation.dimensionScores).map(([dim, score]) => (
+                  <div key={dim} className="rounded bg-surface-elevated p-2 text-center">
+                    <p className="text-xs text-muted capitalize">{dim}</p>
+                    <p className={`text-sm font-bold ${score >= 80 ? "text-success" : score >= 60 ? "text-primary" : "text-danger"}`}>
+                      {score}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
