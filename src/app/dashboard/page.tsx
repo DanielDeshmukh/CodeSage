@@ -20,8 +20,9 @@ interface Exam {
   difficulty: string;
   status: string;
   startedAt: string;
-  questions: unknown[];
-  answers: unknown[];
+  completedAt: string | null;
+  totalScore: number;
+  maxTotalScore: number;
 }
 
 export default function DashboardPage() {
@@ -311,6 +312,36 @@ export default function DashboardPage() {
           </Card>
         </Link>
       </div>
+
+      {/* Score Trend */}
+      {completedExams.length >= 2 && (
+        <Card variant="dark" className="mt-8">
+          <CardHeader>
+            <CardTitle className="text-lg">Score Trend</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-end gap-2" style={{ height: 120 }}>
+              {completedExams.slice(-10).map((exam, i) => {
+                const score = Math.round((exam.totalScore / exam.maxTotalScore) * 100);
+                return (
+                  <div key={exam.id} className="flex flex-1 flex-col items-center gap-1">
+                    <span className="text-xs text-muted">{score}%</span>
+                    <div
+                      className={`w-full rounded-t ${
+                        score >= 80 ? "bg-success" : score >= 60 ? "bg-primary" : "bg-danger"
+                      }`}
+                      style={{ height: `${Math.max(score, 5)}%` }}
+                    />
+                    <span className="text-[10px] text-muted">
+                      {new Date(exam.completedAt ?? exam.startedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
