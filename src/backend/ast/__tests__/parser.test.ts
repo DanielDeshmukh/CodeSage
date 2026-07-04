@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { parseFile, isLanguageSupported, getLanguageFromFilePath } from "../parser";
+import { parseFile, parseFileAsync, isLanguageSupported, getLanguageFromFilePath } from "../parser";
+import { isTreeSitterSupported } from "../tree-sitter-parser";
 
 describe("AST Parser", () => {
-  describe("parseFile", () => {
+  describe("parseFile (sync, regex fallback)", () => {
     describe("TypeScript/JavaScript", () => {
       it("should parse function declarations", () => {
         const code = `
@@ -132,6 +133,53 @@ public class Main {
     });
   });
 
+  describe("parseFileAsync (tree-sitter)", () => {
+    it("should parse TypeScript with tree-sitter", async () => {
+      const code = `
+        function greet(name: string): string {
+          return "Hello, " + name;
+        }
+      `;
+      const chunks = await parseFileAsync(code, "test.ts", "typescript");
+
+      expect(chunks.length).toBeGreaterThanOrEqual(1);
+      expect(chunks.some((c) => c.type === "function")).toBe(true);
+    });
+
+    it("should parse Python with tree-sitter", async () => {
+      const code = `
+def greet(name):
+    return f"Hello, {name}"
+      `;
+      const chunks = await parseFileAsync(code, "test.py", "python");
+
+      expect(chunks.length).toBeGreaterThanOrEqual(1);
+      expect(chunks.some((c) => c.type === "function")).toBe(true);
+    });
+
+    it("should parse Java with tree-sitter", async () => {
+      const code = `
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
+}
+      `;
+      const chunks = await parseFileAsync(code, "Main.java", "java");
+
+      expect(chunks.length).toBeGreaterThanOrEqual(1);
+      expect(chunks.some((c) => c.type === "class" || c.type === "function")).toBe(true);
+    });
+
+    it("should fall back to regex for unsupported languages", async () => {
+      const code = "SELECT * FROM users;";
+      const chunks = await parseFileAsync(code, "query.sql", "sql");
+
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0].type).toBe("module");
+    });
+  });
+
   describe("isLanguageSupported", () => {
     it("should return true for supported languages", () => {
       expect(isLanguageSupported("typescript")).toBe(true);
@@ -143,6 +191,20 @@ public class Main {
     it("should return false for unsupported languages", () => {
       expect(isLanguageSupported("sql")).toBe(false);
       expect(isLanguageSupported("markdown")).toBe(false);
+    });
+  });
+
+  describe("isTreeSitterSupported", () => {
+    it("should return true for languages with tree-sitter grammars", () => {
+      expect(isTreeSitterSupported("typescript")).toBe(true);
+      expect(isTreeSitterSupported("javascript")).toBe(true);
+      expect(isTreeSitterSupported("python")).toBe(true);
+      expect(isTreeSitterSupported("java")).toBe(true);
+    });
+
+    it("should return false for unsupported languages", () => {
+      expect(isTreeSitterSupported("go")).toBe(false);
+      expect(isTreeSitterSupported("rust")).toBe(false);
     });
   });
 

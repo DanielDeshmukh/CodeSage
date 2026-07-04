@@ -16,6 +16,7 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest watch",
+    "postinstall": "node scripts/copy-wasm.js",
     "prepare": "node -e \"if(!process.env.CI){process.exit(1)}\" || husky"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "react-dom": "19.2.4",
     "tailwind-merge": "^3.6.0",
     "uuid": "^14.0.1",
+    "web-tree-sitter": "^0.26.10",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
@@ -50,6 +52,11 @@
     "eslint-config-next": "15.5.19",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
+    "tree-sitter-cli": "^0.26.10",
+    "tree-sitter-java": "^0.23.5",
+    "tree-sitter-javascript": "^0.25.0",
+    "tree-sitter-python": "^0.25.0",
+    "tree-sitter-typescript": "^0.23.2",
     "typescript": "^5",
     "vitest": "^4.1.9"
   }

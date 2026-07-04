@@ -367,6 +367,8 @@ function parsePython(content: string, _filePath: string): ParsedChunk[] {
 // Main Parser
 // ============================================================================
 
+import { parseWithTreeSitter, isTreeSitterSupported } from "./tree-sitter-parser";
+
 export function parseFile(
   content: string,
   filePath: string,
@@ -402,6 +404,29 @@ export function parseFile(
         },
       ];
   }
+}
+
+export async function parseFileAsync(
+  content: string,
+  filePath: string,
+  language: string
+): Promise<ParsedChunk[]> {
+  const lang = language.toLowerCase();
+
+  // Try tree-sitter first for supported languages
+  if (isTreeSitterSupported(lang)) {
+    const chunks = await parseWithTreeSitter(content, lang);
+    if (chunks) {
+      // Add file name to first chunk if needed
+      if (chunks.length > 0 && chunks[0].name === "module") {
+        chunks[0].name = filePath.split("/").pop() || filePath;
+      }
+      return chunks;
+    }
+  }
+
+  // Fall back to regex parser
+  return parseFile(content, filePath, language);
 }
 
 export function isLanguageSupported(language: string): boolean {

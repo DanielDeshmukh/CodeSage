@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getGitHubService } from "@/services/github";
 import { getNIMClient } from "@/ai/nim/client";
 import { getQdrantClient, type QdrantPoint } from "@/backend/vector/qdrant";
-import { parseFile, getLanguageFromFilePath, type ParsedChunk } from "@/backend/ast/parser";
+import { parseFileAsync, getLanguageFromFilePath, type ParsedChunk } from "@/backend/ast/parser";
 import type { CodeChunk, Repository, RepositoryStats, LanguageStat } from "@/types";
 
 // ============================================================================
@@ -88,8 +88,8 @@ export class IngestionPipeline {
         stats.lines += file.content.split("\n").length;
         languageStats.set(language, stats);
 
-        // Parse file
-        const chunks = parseFile(file.content, file.path, language);
+        // Parse file with tree-sitter (falls back to regex)
+        const chunks = await parseFileAsync(file.content, file.path, language);
         allChunks.push(...chunks);
       }
 

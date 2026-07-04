@@ -1,4 +1,4 @@
-export { parseFile, isLanguageSupported, getLanguageFromFilePath } from "./parser";
+export { parseFile, parseFileAsync, isLanguageSupported, getLanguageFromFilePath } from "./parser";
 export type { ASTNode, ParsedChunk } from "./parser";
 export { ChunkNormalizer, getChunkNormalizer } from "./normalizer";
 export type { NormalizedChunk } from "./normalizer";
