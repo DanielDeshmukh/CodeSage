@@ -1,9 +1,19 @@
 import { Pool, type PoolClient } from "pg";
 
 let pool: Pool | null = null;
+let dbAvailable: boolean | null = null;
+
+export function isDatabaseAvailable(): boolean {
+  if (dbAvailable !== null) return dbAvailable;
+  dbAvailable = !!process.env.DATABASE_URL;
+  return dbAvailable;
+}
 
 export function getPool(): Pool {
   if (!pool) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL is not set");
+    }
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 10,
