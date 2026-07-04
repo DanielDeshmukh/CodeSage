@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// In-memory store for demo
-const scores = new Map<string, unknown>();
+import { getScores, addScore } from "@/lib/score-store";
 
 export async function GET() {
-  const scoreList = Array.from(scores.values());
-  return NextResponse.json({ scores: scoreList });
+  const scores = await getScores();
+  return NextResponse.json({ scores });
 }
 
 export async function POST(request: NextRequest) {
@@ -29,7 +27,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    scores.set(id, score);
+    await addScore(score);
     return NextResponse.json({ score }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
