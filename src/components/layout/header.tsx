@@ -166,7 +166,7 @@ export function Header() {
       <div
         ref={menuRef}
         className={cn(
-          "md:hidden fixed top-[60px] left-0 right-0 z-40 border-b border-hairline-soft bg-[#0f1117] backdrop-blur-[16px] shadow-lg shadow-black/30 overflow-hidden transition-all duration-300 ease-in-out",
+          "md:hidden fixed top-[60px] left-0 right-0 z-40 border-b border-hairline-soft bg-[#111923] backdrop-blur-[16px] shadow-lg shadow-black/30 overflow-hidden transition-all duration-300 ease-in-out",
           mobileOpen ? "opacity-100 translate-y-0 max-h-[400px]" : "opacity-0 -translate-y-2 max-h-0 pointer-events-none"
         )}
       >
