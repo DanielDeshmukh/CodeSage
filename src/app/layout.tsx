@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header";
 import { LayoutContent } from "@/components/layout/layout-content";
 import { Footer } from "@/components/layout/footer";
 import { PerformanceMonitor } from "@/components/performance-monitor";
+import { initDatabase } from "@/lib/database/client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,6 +76,9 @@ export const metadata: Metadata = {
     icon: "/icon.png",
   },
 };
+
+// Initialize database on first import (singleton)
+initDatabase().catch(() => {});
 
 export default function RootLayout({
   children,

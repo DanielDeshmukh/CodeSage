@@ -80,39 +80,48 @@ export async function transaction<T>(
 }
 
 export async function initDatabase(): Promise<void> {
-  await query(`
-    CREATE TABLE IF NOT EXISTS exam_sessions (
-      id TEXT PRIMARY KEY,
-      repository_id TEXT NOT NULL,
-      mode TEXT NOT NULL,
-      difficulty TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
-      total_score INTEGER DEFAULT 0,
-      max_total_score INTEGER DEFAULT 0,
-      questions JSONB DEFAULT '[]'::jsonb,
-      answers JSONB DEFAULT '[]'::jsonb,
-      evaluations JSONB DEFAULT '[]'::jsonb,
-      started_at TIMESTAMPTZ,
-      completed_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
+  if (!isDatabaseAvailable()) {
+    console.log("[DB] DATABASE_URL not set, using in-memory storage");
+    return;
+  }
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS exam_sessions (
+        id TEXT PRIMARY KEY,
+        repository_id TEXT NOT NULL,
+        mode TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        total_score INTEGER DEFAULT 0,
+        max_total_score INTEGER DEFAULT 0,
+        questions JSONB DEFAULT '[]'::jsonb,
+        answers JSONB DEFAULT '[]'::jsonb,
+        evaluations JSONB DEFAULT '[]'::jsonb,
+        started_at TIMESTAMPTZ,
+        completed_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
 
-    CREATE TABLE IF NOT EXISTS repositories (
-      id TEXT PRIMARY KEY,
-      github_url TEXT NOT NULL,
-      name TEXT NOT NULL,
-      owner TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
-      language_stats JSONB DEFAULT '{}'::jsonb,
-      total_chunks INTEGER DEFAULT 0,
-      ingested_at TIMESTAMPTZ,
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-    );
+      CREATE TABLE IF NOT EXISTS repositories (
+        id TEXT PRIMARY KEY,
+        github_url TEXT NOT NULL,
+        name TEXT NOT NULL,
+        owner TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        language_stats JSONB DEFAULT '{}'::jsonb,
+        total_chunks INTEGER DEFAULT 0,
+        ingested_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
 
-    CREATE INDEX IF NOT EXISTS idx_sessions_repository ON exam_sessions(repository_id);
-    CREATE INDEX IF NOT EXISTS idx_sessions_status ON exam_sessions(status);
-    CREATE INDEX IF NOT EXISTS idx_repositories_status ON repositories(status);
-  `);
+      CREATE INDEX IF NOT EXISTS idx_sessions_repository ON exam_sessions(repository_id);
+      CREATE INDEX IF NOT EXISTS idx_sessions_status ON exam_sessions(status);
+      CREATE INDEX IF NOT EXISTS idx_repositories_status ON repositories(status);
+    `);
+    console.log("[DB] PostgreSQL connected and schema initialized");
+  } catch (error) {
+    console.error("[DB] Failed to initialize database, falling back to in-memory:", error);
+  }
 }
