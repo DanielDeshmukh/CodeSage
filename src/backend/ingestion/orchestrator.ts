@@ -3,6 +3,9 @@ import { getRepositoryCloner } from "./cloner";
 import { getFileWalker } from "./file-walker";
 import { getLanguageDetector } from "./language-detector";
 import { getSafetyPreFilter } from "./safety-filter";
+import { getEmbeddingPipeline } from "@/backend/vector/embedding-pipeline";
+import { getChunkNormalizer } from "@/backend/ast/normalizer";
+import { parseFileAsync, getLanguageFromFilePath } from "@/backend/ast/parser";
 import { readFile } from "fs/promises";
 
 export interface IngestionProgress {
@@ -12,7 +15,9 @@ export interface IngestionProgress {
     | "walking"
     | "detecting"
     | "safety"
+    | "parsing"
     | "enriching"
+    | "embedding"
     | "storing"
     | "complete";
   message: string;
@@ -30,6 +35,7 @@ export interface IngestionResult {
     unsafeFiles: number;
     languages: Record<string, number>;
     totalSize: number;
+    chunksEmbedded?: number;
   };
   error?: string;
   durationMs: number;
@@ -41,6 +47,8 @@ export class IngestionOrchestrator {
   private walker = getFileWalker();
   private detector = getLanguageDetector();
   private safetyFilter = getSafetyPreFilter();
+  private embeddingPipeline = getEmbeddingPipeline();
+  private normalizer = getChunkNormalizer();
 
   private onProgress?: (progress: IngestionProgress) => void;
 
@@ -148,7 +156,7 @@ export class IngestionOrchestrator {
             return {
               id: file.relativePath,
               path: file.relativePath,
-              content: content.slice(0, 10000), // Limit content size
+              content: content.slice(0, 10000),
             };
           } catch {
             return {
@@ -164,7 +172,78 @@ export class IngestionOrchestrator {
         filesWithContent
       );
 
-      // Stage 6: Complete
+      // Stage 6: Parse files with AST
+      this.reportProgress({
+        stage: "parsing",
+        message: "Parsing source code with AST...",
+        progress: 70,
+      });
+
+      const safeFiles = filesWithContent.filter(
+        (f) => !safetyResult.unsafeFiles.includes(f.id)
+      );
+
+      const allChunks: Array<{
+        id: string;
+        type: string;
+        name: string;
+        language: string;
+        content: string;
+        startLine: number;
+        endLine: number;
+        calls: string[];
+        complexity: number;
+        hasTodos: boolean;
+      }> = [];
+
+      for (const file of safeFiles) {
+        const language = getLanguageFromFilePath(file.path);
+        if (!language) continue;
+
+        try {
+          const chunks = await parseFileAsync(file.content, file.path, language);
+          for (const chunk of chunks) {
+            allChunks.push({
+              id: `${repoId}-${file.path}-${chunk.name}`,
+              type: chunk.type,
+              name: chunk.name,
+              language: chunk.language,
+              content: chunk.content,
+              startLine: chunk.startLine,
+              endLine: chunk.endLine,
+              calls: chunk.calls,
+              complexity: chunk.complexity,
+              hasTodos: chunk.hasTodos,
+            });
+          }
+        } catch {
+          // Skip files that fail to parse
+        }
+      }
+
+      // Normalize chunks
+      const normalizedChunks = this.normalizer.normalizeBatch(allChunks);
+
+      // Stage 7: Generate embeddings and store in Qdrant
+      this.reportProgress({
+        stage: "embedding",
+        message: `Generating embeddings for ${normalizedChunks.length} chunks...`,
+        progress: 80,
+      });
+
+      let chunksEmbedded = 0;
+      try {
+        const embedResult = await this.embeddingPipeline.embedAndStore(
+          normalizedChunks,
+          repoId
+        );
+        chunksEmbedded = embedResult.chunksEmbedded;
+      } catch (error) {
+        console.warn("Embedding failed (non-fatal):", error);
+        // Continue without embeddings - questions will use content directly
+      }
+
+      // Stage 8: Complete
       this.reportProgress({
         stage: "complete",
         message: "Ingestion complete",
@@ -190,6 +269,7 @@ export class IngestionOrchestrator {
           unsafeFiles: safetyResult.unsafeCount,
           languages,
           totalSize: files.reduce((sum, f) => sum + f.size, 0),
+          chunksEmbedded,
         },
         durationMs: Date.now() - startTime,
       };
