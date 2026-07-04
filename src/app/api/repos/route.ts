@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// In-memory store for demo (will be replaced with database)
-const repositories = new Map<string, unknown>();
+import { getRepoStore } from "@/lib/repo-store";
 
 export async function GET() {
+  const repositories = getRepoStore();
   const repos = Array.from(repositories.values());
   return NextResponse.json({ repositories: repos });
 }
@@ -28,6 +27,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
+    const repositories = getRepoStore();
     repositories.set(id, repo);
     return NextResponse.json({ repository: repo }, { status: 201 });
   } catch (error) {

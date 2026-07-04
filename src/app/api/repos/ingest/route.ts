@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIngestionOrchestrator } from "@/backend/ingestion/orchestrator";
+import { getRepoStore } from "@/lib/repo-store";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +28,19 @@ export async function POST(request: NextRequest) {
 
     // Start ingestion (non-blocking for SSE)
     const result = await orchestrator.ingest(repoUrl);
+
+    // Store repo in shared in-memory store so it appears in GET /api/repos
+    if (result.success && result.repositoryId) {
+      const name = repoUrl.split("/").slice(-2).join("/");
+      const store = getRepoStore();
+      store.set(result.repositoryId, {
+        id: result.repositoryId,
+        name,
+        url: repoUrl,
+        stats: result.stats || {},
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     return NextResponse.json({
       success: result.success,
