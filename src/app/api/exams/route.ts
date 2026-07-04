@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// In-memory store for demo
-const exams = new Map<string, unknown>();
+import { getExams, addExam } from "@/lib/exam-store";
 
 export async function GET() {
-  const examList = Array.from(exams.values());
-  return NextResponse.json({ exams: examList });
+  const exams = await getExams();
+  return NextResponse.json({ exams });
 }
 
 export async function POST(request: NextRequest) {
@@ -26,12 +24,16 @@ export async function POST(request: NextRequest) {
       mode,
       difficulty: difficulty || "intermediate",
       status: "in_progress",
-      startedAt: new Date().toISOString(),
+      totalScore: 0,
+      maxTotalScore: 0,
       questions: [],
       answers: [],
+      evaluations: [],
+      startedAt: new Date().toISOString(),
+      completedAt: null,
     };
 
-    exams.set(id, exam);
+    await addExam(exam);
     return NextResponse.json({ exam }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
