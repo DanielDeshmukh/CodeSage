@@ -969,3 +969,23 @@ body {
   gap: 12px;
   position: relative;
 }
+
+/* Print styles */
+@media print {
+  header, nav, aside, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .dark, [data-variant="dark"] {
+    background: white !important;
+    border-color: #e5e7eb !important;
+  }
+  * {
+    color: black !important;
+    background: transparent !important;
+    border-color: #e5e7eb !important;
+  }
+}

@@ -106,6 +106,9 @@ export default function ScoreReportPage() {
           <Link href="/results">
             <Button variant="ghost">View All Reports</Button>
           </Link>
+          <Button variant="ghost" onClick={() => window.print()}>
+            Export PDF
+          </Button>
           <Link href={`/exam/select?repo=${report.repositoryId}`}>
             <Button variant="primary">Retake Exam</Button>
           </Link>
