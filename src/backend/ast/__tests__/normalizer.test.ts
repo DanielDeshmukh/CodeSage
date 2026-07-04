@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ChunkNormalizer } from "../normalizer";
+import { ChunkNormalizer, type NormalizedChunk } from "../normalizer";
 import type { ParsedChunk } from "../parser";
 
 describe("ChunkNormalizer", () => {
@@ -87,22 +87,54 @@ describe("ChunkNormalizer", () => {
 
   describe("buildCallGraph", () => {
     it("should build call relationships", () => {
-      const chunks = [
+      const chunks: NormalizedChunk[] = [
         {
           id: "1",
-          type: "function" as const,
+          type: "function",
           name: "caller",
           content: "caller()",
+          startLine: 1,
+          endLine: 1,
+          lineCount: 1,
+          language: "typescript",
           calls: ["callee"],
           calledBy: [],
+          complexity: 1,
+          hasTodos: false,
+          dependencyCount: 1,
+          summary: null,
+          embedding: null,
+          metadata: {
+            isExported: false,
+            isAsync: false,
+            hasDocstring: false,
+            parameterCount: 0,
+            returnStatements: 0,
+          },
         },
         {
           id: "2",
-          type: "function" as const,
+          type: "function",
           name: "callee",
           content: "callee()",
+          startLine: 2,
+          endLine: 2,
+          lineCount: 1,
+          language: "typescript",
           calls: [],
           calledBy: [],
+          complexity: 1,
+          hasTodos: false,
+          dependencyCount: 0,
+          summary: null,
+          embedding: null,
+          metadata: {
+            isExported: false,
+            isAsync: false,
+            hasDocstring: false,
+            parameterCount: 0,
+            returnStatements: 0,
+          },
         },
       ];
 

@@ -233,6 +233,7 @@ export async function parseWithTreeSitter(
     const parser = new Parser();
     parser.setLanguage(lang);
     const tree = parser.parse(source);
+    if (!tree || !tree.rootNode) return null;
     const chunks = extractChunks(tree.rootNode, source, language);
 
     if (chunks.length === 0) {

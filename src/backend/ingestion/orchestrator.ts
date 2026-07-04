@@ -4,7 +4,7 @@ import { getFileWalker } from "./file-walker";
 import { getLanguageDetector } from "./language-detector";
 import { getSafetyPreFilter } from "./safety-filter";
 import { getEmbeddingPipeline } from "@/backend/vector/embedding-pipeline";
-import { getChunkNormalizer } from "@/backend/ast/normalizer";
+import { getChunkNormalizer, type NormalizedChunk } from "@/backend/ast/normalizer";
 import { parseFileAsync, getLanguageFromFilePath } from "@/backend/ast/parser";
 import { readFile } from "fs/promises";
 
@@ -180,7 +180,7 @@ export class IngestionOrchestrator {
       });
 
       const safeFiles = filesWithContent.filter(
-        (f) => !safetyResult.unsafeFiles.includes(f.id)
+        (f) => !safetyResult.results.has(f.id) || safetyResult.results.get(f.id)?.safety.isSafe !== false
       );
 
       const allChunks: Array<{
@@ -221,8 +221,21 @@ export class IngestionOrchestrator {
         }
       }
 
-      // Normalize chunks
-      const normalizedChunks = this.normalizer.normalizeBatch(allChunks);
+      // Normalize chunks - normalize each file's chunks
+      const normalizedChunks: NormalizedChunk[] = [];
+
+      for (const file of safeFiles) {
+        const language = getLanguageFromFilePath(file.path);
+        if (!language) continue;
+
+        try {
+          const chunks = await parseFileAsync(file.content, file.path, language);
+          const normalized = this.normalizer.normalize(chunks, file.path);
+          normalizedChunks.push(...normalized);
+        } catch {
+          // Skip files that fail to parse
+        }
+      }
 
       // Stage 7: Generate embeddings and store in Qdrant
       this.reportProgress({
