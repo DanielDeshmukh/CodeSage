@@ -111,6 +111,30 @@ export default function DashboardPage() {
     return sum + (stats?.chunks ?? 0);
   }, 0);
 
+  // Language stats across all repos
+  const languageStats: Record<string, number> = {};
+  repositories.forEach((r) => {
+    const stats = r.stats as { languages?: Record<string, number> } | undefined;
+    if (stats?.languages) {
+      Object.entries(stats.languages).forEach(([lang, count]) => {
+        languageStats[lang] = (languageStats[lang] || 0) + count;
+      });
+    }
+  });
+  const topLanguages = Object.entries(languageStats)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+
+  // Mode breakdown
+  const modeStats: Record<string, { count: number; totalScore: number; maxScore: number }> = {};
+  completedExams.forEach((e) => {
+    const current = modeStats[e.mode] || { count: 0, totalScore: 0, maxScore: 0 };
+    current.count++;
+    current.totalScore += e.totalScore;
+    current.maxScore += e.maxTotalScore;
+    modeStats[e.mode] = current;
+  });
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-8">
@@ -342,6 +366,85 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Language Stats & Mode Breakdown */}
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Languages */}
+        {topLanguages.length > 0 && (
+          <Card variant="dark">
+            <CardHeader>
+              <CardTitle className="text-lg">Languages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {topLanguages.map(([lang, count]) => {
+                  const maxCount = topLanguages[0][1];
+                  const percentage = Math.round((count / maxCount) * 100);
+                  return (
+                    <div key={lang} className="flex items-center gap-3">
+                      <span className="w-20 text-sm font-medium text-ink capitalize">{lang}</span>
+                      <div className="flex-1">
+                        <div className="h-2 overflow-hidden rounded-full bg-surface-elevated">
+                          <div
+                            className="h-full rounded-full bg-primary"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                      <span className="w-12 text-right text-sm text-muted">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Mode Performance */}
+        {Object.keys(modeStats).length > 0 && (
+          <Card variant="dark">
+            <CardHeader>
+              <CardTitle className="text-lg">Performance by Mode</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Object.entries(modeStats).map(([mode, stats]) => {
+                  const avgScore = Math.round((stats.totalScore / stats.maxScore) * 100);
+                  return (
+                    <div key={mode} className="rounded-lg border border-hairline p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-ink capitalize">{mode}</p>
+                          <p className="text-xs text-muted">{stats.count} exams taken</p>
+                        </div>
+                        <span
+                          className={`text-2xl font-bold ${
+                            avgScore >= 80
+                              ? "text-success"
+                              : avgScore >= 60
+                                ? "text-primary"
+                                : "text-danger"
+                          }`}
+                        >
+                          {avgScore}%
+                        </span>
+                      </div>
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-elevated">
+                        <div
+                          className={`h-full rounded-full ${
+                            avgScore >= 80 ? "bg-success" : avgScore >= 60 ? "bg-primary" : "bg-danger"
+                          }`}
+                          style={{ width: `${avgScore}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
