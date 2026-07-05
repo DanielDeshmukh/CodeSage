@@ -191,7 +191,7 @@ const FALLBACK_MODELS = {
   embedding: 'nvidia/nv-embedqa-e5-v5',
   reranker: '', // No reranker available
   examiner: 'nvidia/llama-3.3-nemotron-super-49b-v1',
-  scorer: 'nvidia/llama-3.3-nemotron-super-49b-v1',
+  scorer: 'nvidia/llama-3.1-nemotron-70b-instruct', // Different from examiner
   safety: 'nvidia/nemotron-3.5-content-safety',
 };
 
