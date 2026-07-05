@@ -6,40 +6,135 @@ const path = require('path');
 const NIM_API_KEY = process.env.NIM_API_KEY;
 const NIM_BASE_URL = process.env.NIM_BASE_URL || 'https://integrate.api.nvidia.com/v1';
 
-// Model task definitions
+// Model task definitions with strict filtering rules
 const MODEL_TASKS = {
   embedding: {
     name: 'embedding',
     description: 'Code embedding for semantic search',
-    requiredCapabilities: ['embedding', 'code'],
-    preferredDimensions: [384, 512, 768, 1024],
-    maxLatencyMs: 1000,
+    // Only accept embedding models
+    filter: (model) => {
+      const id = model.id.toLowerCase();
+      return id.includes('embed') && !id.includes('rerank');
+    },
+    // Preferred embedding models (in order)
+    preferred: [
+      'nvidia/nv-embedqa-e5-v5',
+      'nvidia/nv-embedcode-7b-v1',
+      'nvidia/llama-nemotron-embed-1b-v2',
+      'nvidia/nv-embedqa-mistral-7b-v2',
+    ],
+    // Must have these capabilities
+    requiredCapabilities: ['embedding'],
+    testEndpoint: '/v1/embeddings',
+    testPayload: (modelId) => ({
+      input: 'function hello() { return "world"; }',
+      model: modelId,
+      input_type: 'passage',
+    }),
   },
   reranker: {
     name: 'reranker',
     description: 'Code relevance reranking',
-    requiredCapabilities: ['reranking', 'code'],
-    maxLatencyMs: 500,
+    // Only accept reranker models
+    filter: (model) => {
+      const id = model.id.toLowerCase();
+      return id.includes('rerank');
+    },
+    preferred: [
+      'nvidia/nv-rerankqa-mistral-4b-v3',
+      'nvidia/llama-nemotron-rerank-1b-v2',
+    ],
+    requiredCapabilities: ['reranking'],
+    testEndpoint: '/v1/ranking',
+    testPayload: (modelId) => ({
+      model: modelId,
+      query: { text: 'How to implement a binary search?' },
+      passages: [
+        { text: 'function binarySearch(arr, target) { ... }' },
+        { text: 'This is about cooking recipes.' },
+      ],
+    }),
   },
   examiner: {
     name: 'examiner',
     description: 'Question generation and code analysis',
-    requiredCapabilities: ['chat', 'code', 'reasoning'],
-    minParameters: '7B',
-    maxLatencyMs: 5000,
+    // Only accept chat/instruct models (NOT embedding, NOT safety)
+    filter: (model) => {
+      const id = model.id.toLowerCase();
+      // Must be a chat/instruct model
+      const isChat = id.includes('chat') || id.includes('instruct') || id.includes('super') || id.includes('ultra');
+      // Must NOT be embedding, reranker, or safety
+      const notEmbed = !id.includes('embed');
+      const notRerank = !id.includes('rerank');
+      const notSafety = !id.includes('safety') && !id.includes('guard');
+      const notReward = !id.includes('reward');
+      return isChat && notEmbed && notRerank && notSafety && notReward;
+    },
+    preferred: [
+      'nvidia/llama-3.3-nemotron-super-49b-v1',
+      'nvidia/llama-3.1-nemotron-70b-instruct',
+      'nvidia/llama-3.3-nemotron-super-49b-v1.5',
+      'nvidia/nemotron-4-340b-instruct',
+    ],
+    requiredCapabilities: ['chat', 'code'],
+    testEndpoint: '/v1/chat/completions',
+    testPayload: (modelId) => ({
+      model: modelId,
+      messages: [{ role: 'user', content: 'Explain this code: function add(a,b) { return a+b; }' }],
+      max_tokens: 50,
+    }),
   },
   scorer: {
     name: 'scorer',
     description: 'Answer evaluation and scoring',
-    requiredCapabilities: ['chat', 'code', 'reasoning'],
-    minParameters: '7B',
-    maxLatencyMs: 5000,
+    // Must be different from examiner - prefer instruct/reward models
+    filter: (model) => {
+      const id = model.id.toLowerCase();
+      // Must be a chat/instruct model
+      const isChat = id.includes('chat') || id.includes('instruct') || id.includes('super') || id.includes('ultra');
+      // Must NOT be embedding, reranker, or safety
+      const notEmbed = !id.includes('embed');
+      const notRerank = !id.includes('rerank');
+      const notSafety = !id.includes('safety') && !id.includes('guard');
+      // Prefer reward/instruct models
+      const isReward = id.includes('reward') || id.includes('instruct');
+      return isChat && notEmbed && notRerank && notSafety && isReward;
+    },
+    preferred: [
+      'nvidia/nemotron-4-340b-reward',
+      'nvidia/nemotron-4-340b-instruct',
+      'nvidia/llama-3.1-nemotron-70b-instruct',
+      'nvidia/llama-3.3-nemotron-super-49b-v1',
+    ],
+    requiredCapabilities: ['chat', 'reasoning'],
+    testEndpoint: '/v1/chat/completions',
+    testPayload: (modelId) => ({
+      model: modelId,
+      messages: [{ role: 'user', content: 'Evaluate this answer: The function adds two numbers.' }],
+      max_tokens: 50,
+    }),
   },
   safety: {
     name: 'safety',
     description: 'Content safety filtering',
-    requiredCapabilities: ['safety', 'classification'],
-    maxLatencyMs: 2000,
+    // Only accept safety/guard models
+    filter: (model) => {
+      const id = model.id.toLowerCase();
+      return id.includes('safety') || id.includes('guard') || id.includes('nemoguard');
+    },
+    preferred: [
+      'nvidia/nemotron-3.5-content-safety',
+      'nvidia/llama-3.1-nemoguard-8b-content-safety',
+      'nvidia/llama-3.1-nemotron-safety-guard-8b-v3',
+      'nvidia/nemotron-3-content-safety',
+    ],
+    requiredCapabilities: ['safety'],
+    testEndpoint: '/v1/chat/completions',
+    testPayload: (modelId) => ({
+      model: modelId,
+      messages: [{ role: 'user', content: 'Hello, how are you?' }],
+      max_tokens: 50,
+    }),
   },
 };
 
@@ -91,142 +186,86 @@ async function fetchAvailableModels() {
   }
 }
 
-// Evaluate a model for a specific task
-async function evaluateModelForTask(model, task) {
-  const evaluation = {
-    modelId: model.id,
-    displayName: model.name || model.id,
-    task: task.name,
-    score: 0,
-    capabilities: [],
-    metrics: {},
-    timestamp: new Date().toISOString(),
-  };
-
-  // Extract model info
-  const modelInfo = {
-    id: model.id,
-    name: model.name || model.id,
-    description: model.description || '',
-    owner: model.owner || '',
-    version: model.version || 'latest',
-    created: model.created || Date.now(),
-  };
-
-  // Score based on capabilities
-  let capabilityScore = 0;
-  
-  // Check if model has required capabilities
-  const hasCapability = (cap) => {
-    const desc = (modelInfo.description + modelInfo.name).toLowerCase();
-    return desc.includes(cap.toLowerCase());
-  };
-
-  for (const cap of task.requiredCapabilities) {
-    if (hasCapability(cap)) {
-      capabilityScore += 20;
-      evaluation.capabilities.push(cap);
-    }
-  }
-
-  // Bonus for code-specific models
-  if (hasCapability('code') || hasCapability('programming')) {
-    capabilityScore += 10;
-  }
-
-  // Bonus for NVIDIA models (typically better NIM integration)
-  if (modelInfo.owner === 'nvidia' || modelInfo.id.startsWith('nvidia/')) {
-    capabilityScore += 15;
-  }
-
-  // Penalty for deprecated models
-  if (modelInfo.description.toLowerCase().includes('deprecated')) {
-    capabilityScore -= 30;
-  }
-
-  // Calculate final score (0-100)
-  evaluation.score = Math.min(100, Math.max(0, capabilityScore));
-  evaluation.metrics = {
-    hasRequiredCapabilities: capabilityScore >= 100,
-    modelAge: Date.now() - modelInfo.created,
-    capabilityMatch: evaluation.capabilities.length / task.requiredCapabilities.length,
-  };
-
-  return evaluation;
-}
-
-// Test model latency and quality
-async function testModelPerformance(modelId, taskName) {
+// Test if a model works for a specific task
+async function testModel(modelId, task) {
+  const taskConfig = MODEL_TASKS[task];
   const startTime = Date.now();
   
   try {
-    let testPayload;
-    
-    switch (taskName) {
-      case 'embedding':
-        testPayload = {
-          input: 'function hello() { return "world"; }',
-          model: modelId,
-          input_type: 'passage',
-        };
-        break;
-      case 'reranker':
-        testPayload = {
-          model: modelId,
-          query: 'How to implement a binary search?',
-          passages: [
-            { text: 'function binarySearch(arr, target) { ... }' },
-            { text: 'This is about cooking recipes.' },
-          ],
-        };
-        break;
-      case 'examiner':
-      case 'scorer':
-        testPayload = {
-          model: modelId,
-          messages: [
-            { role: 'user', content: 'Explain this code: function add(a,b) { return a+b; }' },
-          ],
-          max_tokens: 100,
-        };
-        break;
-      case 'safety':
-        testPayload = {
-          model: modelId,
-          messages: [
-            { role: 'user', content: 'Hello, how are you?' },
-          ],
-        };
-        break;
-      default:
-        return { latencyMs: 0, success: false, error: 'Unknown task' };
-    }
-
-    const endpoint = taskName === 'embedding' ? '/embeddings' :
-                    taskName === 'reranker' ? '/ranking' : '/chat/completions';
-    
-    const response = await makeRequest(`${NIM_BASE_URL}${endpoint}`, {
+    const response = await makeRequest(`${NIM_BASE_URL}${taskConfig.testEndpoint}`, {
       method: 'POST',
-      body: testPayload,
+      body: taskConfig.testPayload(modelId),
     });
 
     const latencyMs = Date.now() - startTime;
     
     return {
-      latencyMs,
       success: !response.error,
-      tokensPerSecond: taskName === 'examiner' || taskName === 'scorer' 
-        ? (response.usage?.completion_tokens || 0) / (latencyMs / 1000)
-        : undefined,
+      latencyMs,
       error: response.error?.message || null,
     };
   } catch (error) {
     return {
-      latencyMs: Date.now() - startTime,
       success: false,
+      latencyMs: Date.now() - startTime,
       error: error.message,
     };
   }
+}
+
+// Evaluate a model for a specific task
+async function evaluateModel(model, task, usedModels) {
+  const taskConfig = MODEL_TASKS[task];
+  const modelId = model.id;
+  
+  // Skip if model already used for another task
+  if (usedModels.has(modelId)) {
+    return null;
+  }
+
+  // Apply task-specific filter
+  if (!taskConfig.filter(model)) {
+    return null;
+  }
+
+  console.log(`  Testing ${modelId}...`);
+  
+  // Test if model works
+  const testResult = await testModel(modelId, task);
+  
+  if (!testResult.success) {
+    console.log(`    Failed: ${testResult.error}`);
+    return null;
+  }
+
+  // Calculate score
+  let score = 50; // Base score for working model
+  
+  // Bonus for preferred models
+  if (taskConfig.preferred.includes(modelId)) {
+    score += 30;
+  }
+  
+  // Bonus for NVIDIA models
+  if (modelId.startsWith('nvidia/')) {
+    score += 10;
+  }
+  
+  // Penalty for slow models
+  if (testResult.latencyMs > 3000) {
+    score -= 10;
+  } else if (testResult.latencyMs < 1000) {
+    score += 5;
+  }
+
+  return {
+    modelId,
+    displayName: model.name || modelId,
+    task,
+    score,
+    latencyMs: testResult.latencyMs,
+    isPreferred: taskConfig.preferred.includes(modelId),
+  };
 }
 
 // Main evaluation function
@@ -244,68 +283,54 @@ async function evaluateModels() {
   console.log(`Found ${models.length} available models\n`);
 
   const results = {};
+  const usedModels = new Set(); // Track used models to avoid duplicates
   
-  // Evaluate each task
-  for (const [taskName, taskConfig] of Object.entries(MODEL_TASKS)) {
+  // Evaluate each task in priority order
+  const taskPriority = ['embedding', 'safety', 'examiner', 'scorer', 'reranker'];
+  
+  for (const task of taskPriority) {
+    const taskConfig = MODEL_TASKS[task];
     console.log(`\nEvaluating models for: ${taskConfig.description}`);
     console.log('='.repeat(50));
 
     const evaluations = [];
 
     for (const model of models) {
-      // Skip obviously wrong models
-      const modelId = model.id.toLowerCase();
-      const isRelevant = taskConfig.requiredCapabilities.some(cap => 
-        modelId.includes(cap.toLowerCase()) ||
-        (model.name && model.name.toLowerCase().includes(cap.toLowerCase()))
-      );
-
-      if (!isRelevant) {
-        continue;
+      const evaluation = await evaluateModel(model, task, usedModels);
+      if (evaluation) {
+        evaluations.push(evaluation);
       }
-
-      // Evaluate model
-      const evaluation = await evaluateModelForTask(model, taskConfig);
-      
-      // Test performance if model looks promising
-      if (evaluation.score >= 50) {
-        console.log(`  Testing ${model.id}...`);
-        const performance = await testModelPerformance(model.id, taskName);
-        evaluation.metrics.performance = performance;
-        
-        // Adjust score based on performance
-        if (performance.success) {
-          evaluation.score += 10;
-          if (performance.latencyMs < taskConfig.maxLatencyMs) {
-            evaluation.score += 5;
-          }
-        } else {
-          evaluation.score -= 20;
-        }
-      }
-
-      evaluations.push(evaluation);
     }
 
-    // Sort by score and pick the best
-    evaluations.sort((a, b) => b.score - a.score);
+    // Sort by score (preferred models first)
+    evaluations.sort((a, b) => {
+      if (a.isPreferred && !b.isPreferred) return -1;
+      if (!a.isPreferred && b.isPreferred) return 1;
+      return b.score - a.score;
+    });
     
     const bestModel = evaluations[0];
     
     if (bestModel) {
-      console.log(`\nBest model for ${taskName}:`);
+      console.log(`\nBest model for ${task}:`);
       console.log(`  ID: ${bestModel.modelId}`);
       console.log(`  Score: ${bestModel.score}/100`);
-      console.log(`  Capabilities: ${bestModel.capabilities.join(', ')}`);
+      console.log(`  Latency: ${bestModel.latencyMs}ms`);
       
-      results[taskName] = {
+      // Mark model as used
+      usedModels.add(bestModel.modelId);
+      
+      results[task] = {
         selected: bestModel,
-        alternatives: evaluations.slice(1, 3),
-        allEvaluations: evaluations,
+        alternatives: evaluations.slice(1, 3).map(e => ({
+          modelId: e.modelId,
+          score: e.score,
+          latencyMs: e.latencyMs,
+        })),
       };
     } else {
-      console.log(`\nNo suitable model found for ${taskName}`);
-      results[taskName] = { selected: null, alternatives: [], allEvaluations: [] };
+      console.log(`\nNo suitable model found for ${task}`);
+      results[task] = { selected: null, alternatives: [] };
     }
   }
 
@@ -326,16 +351,20 @@ function saveResults(results) {
   fs.writeFileSync(filename, JSON.stringify(results, null, 2));
   console.log(`\nResults saved to: ${filename}`);
 
-  // Also save a summary for easy reading
+  // Save summary
   const summary = Object.entries(results).map(([task, data]) => ({
     task,
     selectedModel: data.selected?.modelId || 'None',
     score: data.selected?.score || 0,
+    latencyMs: data.selected?.latencyMs || 0,
     alternatives: data.alternatives?.map(a => a.modelId) || [],
   }));
 
   const summaryFile = path.join(outputDir, 'latest-evaluation.json');
-  fs.writeFileSync(summaryFile, JSON.stringify({ timestamp: new Date().toISOString(), results: summary }, null, 2));
+  fs.writeFileSync(summaryFile, JSON.stringify({ 
+    timestamp: new Date().toISOString(), 
+    results: summary 
+  }, null, 2));
   
   return summary;
 }
@@ -354,11 +383,22 @@ if (require.main === module) {
         console.log(`\n${item.task.toUpperCase()}:`);
         console.log(`  Selected: ${item.selectedModel}`);
         console.log(`  Score: ${item.score}/100`);
+        console.log(`  Latency: ${item.latencyMs}ms`);
         if (item.alternatives.length > 0) {
           console.log(`  Alternatives: ${item.alternatives.join(', ')}`);
         }
       });
       
+      // Verify no duplicates
+      const selectedModels = summary.map(s => s.selectedModel).filter(m => m !== 'None');
+      const uniqueModels = new Set(selectedModels);
+      
+      if (selectedModels.length !== uniqueModels.size) {
+        console.error('\n❌ ERROR: Duplicate models detected!');
+        process.exit(1);
+      }
+      
+      console.log('\n✅ All tasks have unique models');
       process.exit(0);
     })
     .catch(error => {
