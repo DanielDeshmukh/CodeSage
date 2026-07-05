@@ -186,6 +186,15 @@ async function fetchAvailableModels() {
   }
 }
 
+// Fallback models (known working on NIM free tier)
+const FALLBACK_MODELS = {
+  embedding: 'nvidia/nv-embedqa-e5-v5',
+  reranker: '', // No reranker available
+  examiner: 'nvidia/llama-3.3-nemotron-super-49b-v1',
+  scorer: 'nvidia/llama-3.3-nemotron-super-49b-v1',
+  safety: 'nvidia/nemotron-3.5-content-safety',
+};
+
 // Test if a model works for a specific task
 async function testModel(modelId, task) {
   const taskConfig = MODEL_TASKS[task];
@@ -329,8 +338,27 @@ async function evaluateModels() {
         })),
       };
     } else {
-      console.log(`\nNo suitable model found for ${task}`);
-      results[task] = { selected: null, alternatives: [] };
+      // Use fallback model if available
+      const fallbackId = FALLBACK_MODELS[task];
+      if (fallbackId && !usedModels.has(fallbackId)) {
+        console.log(`\nUsing fallback model for ${task}: ${fallbackId}`);
+        usedModels.add(fallbackId);
+        results[task] = {
+          selected: {
+            modelId: fallbackId,
+            displayName: fallbackId,
+            task,
+            score: 50,
+            latencyMs: 0,
+            isPreferred: true,
+            isFallback: true,
+          },
+          alternatives: [],
+        };
+      } else {
+        console.log(`\nNo suitable model found for ${task}`);
+        results[task] = { selected: null, alternatives: [] };
+      }
     }
   }
 
