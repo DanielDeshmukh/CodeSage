@@ -22,9 +22,28 @@ describe("QuestionGenerator", () => {
   });
 
   describe("generateQuestion", () => {
-    it("should return null when no chunks found", async () => {
+    it("should generate generic question when no chunks found", async () => {
       const mockRetrieve = vi.fn().mockResolvedValue({ chunks: [] });
       (generator as any).retrievalPipeline.retrieve = mockRetrieve;
+
+      const mockChat = vi.fn().mockResolvedValue({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify([
+                {
+                  id: "q1",
+                  question: "What are the main design patterns used in this codebase?",
+                  type: "conceptual",
+                  difficulty: "intermediate",
+                  expectedPoints: ["Design patterns", "Architecture"],
+                },
+              ]),
+            },
+          },
+        ],
+      });
+      (generator as any).client.chat = mockChat;
 
       const result = await generator.generateQuestion({
         repositoryId: "repo-1",
@@ -32,7 +51,9 @@ describe("QuestionGenerator", () => {
         difficulty: "intermediate",
       });
 
-      expect(result).toBeNull();
+      expect(result).not.toBeNull();
+      expect(result?.question).toBe("What are the main design patterns used in this codebase?");
+      expect(result?.sourceChunk.name).toBe("general");
     });
 
     it("should generate question from retrieved chunk", async () => {

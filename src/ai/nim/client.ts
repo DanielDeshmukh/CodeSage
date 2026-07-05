@@ -102,7 +102,7 @@ export class NIMClient {
   }
 
   async embed(request: NIMEmbeddingRequest): Promise<NIMEmbeddingResponse> {
-    const model = request.model || "nvidia/nv-embedqa-e5-v5";
+    const model = request.model || env.NIM_EMBED_MODEL;
     const response = await fetch(`${this.baseUrl}/v1/embeddings`, {
       method: "POST",
       headers: this.getHeaders(),
@@ -110,6 +110,7 @@ export class NIMClient {
         input: request.input,
         model,
         encoding_format: "float",
+        input_type: "passage",
       }),
     });
 
@@ -120,8 +121,41 @@ export class NIMClient {
     return response.json();
   }
 
+  async embedQuery(query: string): Promise<number[]> {
+    const model = env.NIM_EMBED_MODEL;
+    const response = await fetch(`${this.baseUrl}/v1/embeddings`, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify({
+        input: query,
+        model,
+        encoding_format: "float",
+        input_type: "query",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`NIM EmbedQuery failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data[0];
+  }
+
   async rerank(request: NIMRerankRequest): Promise<NIMRerankResponse> {
-    const model = request.model || "nvidia/nv-rerankqa-mistral-4b-v3";
+    // If no reranker model configured, return original order with equal scores
+    if (!env.NIM_RERANK_MODEL) {
+      return {
+        results: request.documents.map((_, index) => ({
+          index,
+          relevance_score: 1.0 - (index * 0.1), // Decreasing scores
+        })),
+        model: "none",
+        usage: { prompt_tokens: 0, total_tokens: 0 },
+      };
+    }
+
+    const model = env.NIM_RERANK_MODEL;
     const response = await fetch(`${this.baseUrl}/v1/ranking`, {
       method: "POST",
       headers: this.getHeaders(),
@@ -134,7 +168,15 @@ export class NIMClient {
     });
 
     if (!response.ok) {
-      throw new Error(`NIM Rerank failed: ${response.statusText}`);
+      // Fallback to original order if reranking fails
+      return {
+        results: request.documents.map((_, index) => ({
+          index,
+          relevance_score: 1.0 - (index * 0.1),
+        })),
+        model: "fallback",
+        usage: { prompt_tokens: 0, total_tokens: 0 },
+      };
     }
 
     return response.json();
@@ -166,7 +208,7 @@ export class NIMClient {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({
-        model: "nvidia/llama-3.1-nemotron-70b-instruct",
+        model: env.NIM_SAFETY_MODEL,
         messages: [
           {
             role: "system",
@@ -207,11 +249,10 @@ export class NIMClient {
 
   async healthCheck(): Promise<Record<string, boolean>> {
     const models = [
-      { name: "embed", model: "nvidia/nv-embedqa-e5-v5" },
-      { name: "rerank", model: "nvidia/nv-rerankqa-mistral-4b-v3" },
-      { name: "examiner", model: "meta/llama-3.3-70b-instruct" },
-      { name: "scorer", model: "nvidia/llama-3.1-nemotron-70b-instruct" },
-      { name: "safety", model: "nvidia/llama-3.1-nemotron-70b-instruct" },
+      { name: "embed", model: env.NIM_EMBED_MODEL },
+      { name: "examiner", model: env.NIM_EXAMINER_MODEL },
+      { name: "scorer", model: env.NIM_SCORER_MODEL },
+      { name: "safety", model: env.NIM_SAFETY_MODEL },
     ];
 
     const health: Record<string, boolean> = {};
@@ -219,13 +260,25 @@ export class NIMClient {
     await Promise.allSettled(
       models.map(async (m) => {
         try {
-          await this.embed({ input: ["health check"], model: m.model });
+          // Test embedding for embed model, chat for others
+          if (m.name === "embed") {
+            await this.embed({ input: ["health check"], model: m.model });
+          } else {
+            await this.chat({
+              model: m.model,
+              messages: [{ role: "user", content: "hi" }],
+              max_tokens: 5,
+            });
+          }
           health[m.name] = true;
         } catch {
           health[m.name] = false;
         }
       })
     );
+
+    // Reranker is optional
+    health.reranker = !!env.NIM_RERANK_MODEL;
 
     return health;
   }

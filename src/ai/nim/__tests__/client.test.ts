@@ -87,7 +87,7 @@ describe("NIMClient", () => {
       const health = await client.healthCheck();
 
       expect(health).toHaveProperty("embed");
-      expect(health).toHaveProperty("rerank");
+      expect(health).toHaveProperty("reranker");
       expect(health).toHaveProperty("examiner");
       expect(health).toHaveProperty("scorer");
       expect(health).toHaveProperty("safety");

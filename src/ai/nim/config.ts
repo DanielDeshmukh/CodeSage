@@ -30,8 +30,8 @@ export const NIM_MODELS = {
   } as const,
 
   examiner: {
-    id: "meta/llama-3.3-70b-instruct",
-    name: "Llama-3.3-70B-Instruct",
+    id: "nvidia/llama-3.3-nemotron-super-49b-v1",
+    name: "Nemotron-Super-49B",
     endpoint: "/v1/chat/completions",
     maxTokens: 4096,
     temperature: 0.7,
@@ -40,8 +40,8 @@ export const NIM_MODELS = {
   } as const,
 
   scorer: {
-    id: "nvidia/llama-3.1-nemotron-70b-instruct",
-    name: "Nemotron-70B-Reward",
+    id: "nvidia/nemotron-4-340b-reward",
+    name: "Nemotron-340B-Reward",
     endpoint: "/v1/chat/completions",
     maxTokens: 2048,
     temperature: 0.3,
@@ -50,8 +50,8 @@ export const NIM_MODELS = {
   } as const,
 
   safety: {
-    id: "nvidia/llama-3.1-nemotron-70b-instruct",
-    name: "Nemotron-3.5-Content-Safety",
+    id: "nvidia/nemotron-3.5-content-safety",
+    name: "Nemotron-Content-Safety",
     endpoint: "/v1/chat/completions",
     maxTokens: 256,
     temperature: 0.1,

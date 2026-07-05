@@ -1,0 +1,44 @@
+[
+  {
+    "id": "3ac8d8cf-7757-4b0f-93d2-f1d70ebcb5cb",
+    "repositoryId": "repo-aox8w4",
+    "mode": "viva",
+    "difficulty": "intermediate",
+    "status": "pending",
+    "totalScore": 0,
+    "maxTotalScore": 0,
+    "questions": [],
+    "answers": [],
+    "evaluations": [],
+    "startedAt": "2026-07-04T13:24:34.108Z",
+    "completedAt": null
+  },
+  {
+    "id": "f7c7f668-589d-4cd5-8c76-57e8ca8c56ff",
+    "repositoryId": "repo-aox8w4",
+    "mode": "viva",
+    "difficulty": "intermediate",
+    "status": "pending",
+    "totalScore": 0,
+    "maxTotalScore": 0,
+    "questions": [],
+    "answers": [],
+    "evaluations": [],
+    "startedAt": "2026-07-04T13:24:45.628Z",
+    "completedAt": null
+  },
+  {
+    "id": "ff7f8fa8-e1e1-4ea1-828c-2980043a6b02",
+    "repositoryId": "repo-aox8w4",
+    "mode": "viva",
+    "difficulty": "intermediate",
+    "status": "pending",
+    "totalScore": 0,
+    "maxTotalScore": 0,
+    "questions": [],
+    "answers": [],
+    "evaluations": [],
+    "startedAt": "2026-07-04T15:19:29.302Z",
+    "completedAt": null
+  }
+]

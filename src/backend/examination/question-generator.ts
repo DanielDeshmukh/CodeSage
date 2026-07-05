@@ -43,30 +43,54 @@ export class QuestionGenerator {
       previousQuestions = [],
     } = options;
 
-    // Retrieve relevant code chunks
-    const retrievalResult = await this.retrievalPipeline.retrieve({
-      repositoryId,
-      query,
-      topK: 3,
-      rerankTopN: 3,
-    });
+    let context: PromptContext;
+    let chunk = null;
 
-    if (retrievalResult.chunks.length === 0) {
-      return null;
+    try {
+      // Try to retrieve relevant code chunks
+      const retrievalResult = await this.retrievalPipeline.retrieve({
+        repositoryId,
+        query,
+        topK: 3,
+        rerankTopN: 3,
+      });
+
+      if (retrievalResult.chunks.length > 0) {
+        chunk = retrievalResult.chunks[0];
+        context = {
+          repositoryId,
+          language: chunk.language,
+          filePath: chunk.filePath || "unknown",
+          chunkName: chunk.name,
+          codeContent: chunk.content,
+          summary: chunk.summary || undefined,
+          previousQuestions,
+        };
+      } else {
+        // Fallback: generate generic question without code context
+        context = {
+          repositoryId,
+          language: "unknown",
+          filePath: "unknown",
+          chunkName: "general",
+          codeContent: "",
+          summary: undefined,
+          previousQuestions,
+        };
+      }
+    } catch (error) {
+      // If retrieval fails (e.g., Qdrant not available), use generic context
+      console.warn("Retrieval failed, using generic context:", error);
+      context = {
+        repositoryId,
+        language: "unknown",
+        filePath: "unknown",
+        chunkName: "general",
+        codeContent: "",
+        summary: undefined,
+        previousQuestions,
+      };
     }
-
-    // Use the most relevant chunk
-    const chunk = retrievalResult.chunks[0];
-
-    const context: PromptContext = {
-      repositoryId,
-      language: chunk.language,
-      filePath: chunk.filePath || "unknown",
-      chunkName: chunk.name,
-      codeContent: chunk.content,
-      summary: chunk.summary || undefined,
-      previousQuestions,
-    };
 
     const systemPrompt = getExaminerSystemPrompt(mode);
     const userPrompt = getQuestionGenerationPrompt(
@@ -100,17 +124,22 @@ export class QuestionGenerator {
             type: q.type || "conceptual",
             difficulty: q.difficulty || difficulty,
             context: {
-              filePath: chunk.filePath || "unknown",
-              language: chunk.language,
-              chunkName: chunk.name,
+              filePath: chunk?.filePath || "unknown",
+              language: chunk?.language || "unknown",
+              chunkName: chunk?.name || "general",
             },
             expectedPoints: q.expectedPoints || [],
             followUp: q.followUp,
-            sourceChunk: {
+            sourceChunk: chunk ? {
               id: chunk.id,
               name: chunk.name,
               filePath: chunk.filePath || "unknown",
               language: chunk.language,
+            } : {
+              id: "generic",
+              name: "general",
+              filePath: "unknown",
+              language: "unknown",
             },
           };
         }
