@@ -2,29 +2,27 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-// NIM API configuration
 const NIM_API_KEY = process.env.NIM_API_KEY;
 const NIM_BASE_URL = process.env.NIM_BASE_URL || 'https://integrate.api.nvidia.com/v1';
 
-// Model task definitions with strict filtering rules
+// Task definitions with strict filtering
 const MODEL_TASKS = {
   embedding: {
     name: 'embedding',
     description: 'Code embedding for semantic search',
-    // Only accept embedding models
     filter: (model) => {
       const id = model.id.toLowerCase();
       return id.includes('embed') && !id.includes('rerank');
     },
-    // Preferred embedding models (in order)
     preferred: [
       'nvidia/nv-embedqa-e5-v5',
       'nvidia/nv-embedcode-7b-v1',
       'nvidia/llama-nemotron-embed-1b-v2',
       'nvidia/nv-embedqa-mistral-7b-v2',
+      'nvidia/embed-qa-4',
+      'nvidia/nv-embed-v1',
+      'snowflake/arctic-embed-l',
     ],
-    // Must have these capabilities
-    requiredCapabilities: ['embedding'],
     testEndpoint: '/v1/embeddings',
     testPayload: (modelId) => ({
       input: 'function hello() { return "world"; }',
@@ -35,7 +33,6 @@ const MODEL_TASKS = {
   reranker: {
     name: 'reranker',
     description: 'Code relevance reranking',
-    // Only accept reranker models
     filter: (model) => {
       const id = model.id.toLowerCase();
       return id.includes('rerank');
@@ -44,7 +41,6 @@ const MODEL_TASKS = {
       'nvidia/nv-rerankqa-mistral-4b-v3',
       'nvidia/llama-nemotron-rerank-1b-v2',
     ],
-    requiredCapabilities: ['reranking'],
     testEndpoint: '/v1/ranking',
     testPayload: (modelId) => ({
       model: modelId,
@@ -58,12 +54,9 @@ const MODEL_TASKS = {
   examiner: {
     name: 'examiner',
     description: 'Question generation and code analysis',
-    // Only accept chat/instruct models (NOT embedding, NOT safety)
     filter: (model) => {
       const id = model.id.toLowerCase();
-      // Must be a chat/instruct model
       const isChat = id.includes('chat') || id.includes('instruct') || id.includes('super') || id.includes('ultra');
-      // Must NOT be embedding, reranker, or safety
       const notEmbed = !id.includes('embed');
       const notRerank = !id.includes('rerank');
       const notSafety = !id.includes('safety') && !id.includes('guard');
@@ -75,8 +68,13 @@ const MODEL_TASKS = {
       'nvidia/llama-3.1-nemotron-70b-instruct',
       'nvidia/llama-3.3-nemotron-super-49b-v1.5',
       'nvidia/nemotron-4-340b-instruct',
+      'nvidia/llama-3.1-nemotron-51b-instruct',
+      'nvidia/nemotron-3-super-120b-a12b',
+      'meta/llama-3.3-70b-instruct',
+      'meta/llama-3.1-70b-instruct',
+      'ibm/granite-34b-code-instruct',
+      'deepseek-ai/deepseek-coder-6.7b-instruct',
     ],
-    requiredCapabilities: ['chat', 'code'],
     testEndpoint: '/v1/chat/completions',
     testPayload: (modelId) => ({
       model: modelId,
@@ -87,26 +85,24 @@ const MODEL_TASKS = {
   scorer: {
     name: 'scorer',
     description: 'Answer evaluation and scoring',
-    // Must be different from examiner - prefer instruct/reward models
     filter: (model) => {
       const id = model.id.toLowerCase();
-      // Must be a chat/instruct model
-      const isChat = id.includes('chat') || id.includes('instruct') || id.includes('super') || id.includes('ultra');
-      // Must NOT be embedding, reranker, or safety
+      const isChat = id.includes('chat') || id.includes('instruct') || id.includes('super') || id.includes('ultra') || id.includes('reward');
       const notEmbed = !id.includes('embed');
       const notRerank = !id.includes('rerank');
       const notSafety = !id.includes('safety') && !id.includes('guard');
-      // Prefer reward/instruct models
-      const isReward = id.includes('reward') || id.includes('instruct');
-      return isChat && notEmbed && notRerank && notSafety && isReward;
+      return isChat && notEmbed && notRerank && notSafety;
     },
     preferred: [
       'nvidia/nemotron-4-340b-reward',
       'nvidia/nemotron-4-340b-instruct',
       'nvidia/llama-3.1-nemotron-70b-instruct',
       'nvidia/llama-3.3-nemotron-super-49b-v1',
+      'nvidia/llama-3.1-nemotron-51b-instruct',
+      'nvidia/nemotron-3-super-120b-a12b',
+      'meta/llama-3.3-70b-instruct',
+      'ibm/granite-34b-code-instruct',
     ],
-    requiredCapabilities: ['chat', 'reasoning'],
     testEndpoint: '/v1/chat/completions',
     testPayload: (modelId) => ({
       model: modelId,
@@ -117,7 +113,6 @@ const MODEL_TASKS = {
   safety: {
     name: 'safety',
     description: 'Content safety filtering',
-    // Only accept safety/guard models
     filter: (model) => {
       const id = model.id.toLowerCase();
       return id.includes('safety') || id.includes('guard') || id.includes('nemoguard');
@@ -127,8 +122,9 @@ const MODEL_TASKS = {
       'nvidia/llama-3.1-nemoguard-8b-content-safety',
       'nvidia/llama-3.1-nemotron-safety-guard-8b-v3',
       'nvidia/nemotron-3-content-safety',
+      'nvidia/nemotron-content-safety-reasoning-4b',
+      'meta/llama-guard-4-12b',
     ],
-    requiredCapabilities: ['safety'],
     testEndpoint: '/v1/chat/completions',
     testPayload: (modelId) => ({
       model: modelId,
@@ -138,7 +134,6 @@ const MODEL_TASKS = {
   },
 };
 
-// Helper to make NIM API requests
 function makeRequest(url, options = {}) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, {
@@ -161,7 +156,7 @@ function makeRequest(url, options = {}) {
     });
 
     req.on('error', reject);
-    req.setTimeout(10000, () => {
+    req.setTimeout(15000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
@@ -173,10 +168,8 @@ function makeRequest(url, options = {}) {
   });
 }
 
-// Fetch all available models from NIM
 async function fetchAvailableModels() {
   console.log('Fetching available models from NIM API...');
-  
   try {
     const response = await makeRequest(`${NIM_BASE_URL}/models`);
     return response.data || [];
@@ -186,16 +179,6 @@ async function fetchAvailableModels() {
   }
 }
 
-// Fallback models (known working on NIM free tier)
-const FALLBACK_MODELS = {
-  embedding: 'nvidia/nv-embedqa-e5-v5',
-  reranker: '', // No reranker available
-  examiner: 'nvidia/llama-3.3-nemotron-super-49b-v1',
-  scorer: 'nvidia/llama-3.1-nemotron-70b-instruct', // Different from examiner
-  safety: 'nvidia/nemotron-3.5-content-safety',
-};
-
-// Test if a model works for a specific task
 async function testModel(modelId, task) {
   const taskConfig = MODEL_TASKS[task];
   const startTime = Date.now();
@@ -209,7 +192,7 @@ async function testModel(modelId, task) {
     const latencyMs = Date.now() - startTime;
     
     return {
-      success: !response.error,
+      success: !response.error && (response.data || response.choices || response.results),
       latencyMs,
       error: response.error?.message || null,
     };
@@ -222,66 +205,9 @@ async function testModel(modelId, task) {
   }
 }
 
-// Evaluate a model for a specific task
-async function evaluateModel(model, task, usedModels) {
-  const taskConfig = MODEL_TASKS[task];
-  const modelId = model.id;
-  
-  // Skip if model already used for another task
-  if (usedModels.has(modelId)) {
-    return null;
-  }
-
-  // Apply task-specific filter
-  if (!taskConfig.filter(model)) {
-    return null;
-  }
-
-  console.log(`  Testing ${modelId}...`);
-  
-  // Test if model works
-  const testResult = await testModel(modelId, task);
-  
-  if (!testResult.success) {
-    console.log(`    Failed: ${testResult.error}`);
-    return null;
-  }
-
-  // Calculate score
-  let score = 50; // Base score for working model
-  
-  // Bonus for preferred models
-  if (taskConfig.preferred.includes(modelId)) {
-    score += 30;
-  }
-  
-  // Bonus for NVIDIA models
-  if (modelId.startsWith('nvidia/')) {
-    score += 10;
-  }
-  
-  // Penalty for slow models
-  if (testResult.latencyMs > 3000) {
-    score -= 10;
-  } else if (testResult.latencyMs < 1000) {
-    score += 5;
-  }
-
-  return {
-    modelId,
-    displayName: model.name || modelId,
-    task,
-    score,
-    latencyMs: testResult.latencyMs,
-    isPreferred: taskConfig.preferred.includes(modelId),
-  };
-}
-
-// Main evaluation function
 async function evaluateModels() {
-  console.log('Starting NIM model evaluation...\n');
+  console.log('Starting comprehensive NIM model evaluation...\n');
 
-  // Fetch available models
   const models = await fetchAvailableModels();
   
   if (models.length === 0) {
@@ -292,26 +218,48 @@ async function evaluateModels() {
   console.log(`Found ${models.length} available models\n`);
 
   const results = {};
-  const usedModels = new Set(); // Track used models to avoid duplicates
+  const usedModels = new Set();
   
-  // Evaluate each task in priority order
-  const taskPriority = ['embedding', 'safety', 'examiner', 'scorer', 'reranker'];
-  
-  for (const task of taskPriority) {
-    const taskConfig = MODEL_TASKS[task];
-    console.log(`\nEvaluating models for: ${taskConfig.description}`);
-    console.log('='.repeat(50));
+  // Test each task
+  for (const [task, taskConfig] of Object.entries(MODEL_TASKS)) {
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`Evaluating: ${taskConfig.description}`);
+    console.log(`${'='.repeat(60)}`);
 
     const evaluations = [];
+    const testModels = models.filter(taskConfig.filter);
+    
+    console.log(`Found ${testModels.length} candidate models`);
 
-    for (const model of models) {
-      const evaluation = await evaluateModel(model, task, usedModels);
-      if (evaluation) {
-        evaluations.push(evaluation);
+    for (const model of testModels) {
+      if (usedModels.has(model.id)) {
+        continue;
+      }
+
+      console.log(`  Testing ${model.id}...`);
+      
+      const testResult = await testModel(model.id, task);
+      
+      if (testResult.success) {
+        console.log(`    ✅ WORKS (${testResult.latencyMs}ms)`);
+        
+        let score = 50;
+        if (taskConfig.preferred.includes(model.id)) score += 30;
+        if (model.id.startsWith('nvidia/')) score += 10;
+        if (testResult.latencyMs < 2000) score += 10;
+        
+        evaluations.push({
+          modelId: model.id,
+          score,
+          latencyMs: testResult.latencyMs,
+          isPreferred: taskConfig.preferred.includes(model.id),
+        });
+      } else {
+        console.log(`    ❌ FAILED: ${testResult.error}`);
       }
     }
 
-    // Sort by score (preferred models first)
+    // Sort by score (preferred first)
     evaluations.sort((a, b) => {
       if (a.isPreferred && !b.isPreferred) return -1;
       if (!a.isPreferred && b.isPreferred) return 1;
@@ -321,51 +269,26 @@ async function evaluateModels() {
     const bestModel = evaluations[0];
     
     if (bestModel) {
-      console.log(`\nBest model for ${task}:`);
-      console.log(`  ID: ${bestModel.modelId}`);
-      console.log(`  Score: ${bestModel.score}/100`);
-      console.log(`  Latency: ${bestModel.latencyMs}ms`);
+      console.log(`\n🏆 Best model for ${task}: ${bestModel.modelId}`);
+      console.log(`   Score: ${bestModel.score}/100, Latency: ${bestModel.latencyMs}ms`);
       
-      // Mark model as used
       usedModels.add(bestModel.modelId);
       
       results[task] = {
         selected: bestModel,
-        alternatives: evaluations.slice(1, 3).map(e => ({
-          modelId: e.modelId,
-          score: e.score,
-          latencyMs: e.latencyMs,
-        })),
+        alternatives: evaluations.slice(1, 3),
+        totalTested: testModels.length,
+        totalWorking: evaluations.length,
       };
     } else {
-      // Use fallback model if available
-      const fallbackId = FALLBACK_MODELS[task];
-      if (fallbackId && !usedModels.has(fallbackId)) {
-        console.log(`\nUsing fallback model for ${task}: ${fallbackId}`);
-        usedModels.add(fallbackId);
-        results[task] = {
-          selected: {
-            modelId: fallbackId,
-            displayName: fallbackId,
-            task,
-            score: 50,
-            latencyMs: 0,
-            isPreferred: true,
-            isFallback: true,
-          },
-          alternatives: [],
-        };
-      } else {
-        console.log(`\nNo suitable model found for ${task}`);
-        results[task] = { selected: null, alternatives: [] };
-      }
+      console.log(`\n⚠️  No working model found for ${task}`);
+      results[task] = { selected: null, alternatives: [], totalTested: testModels.length, totalWorking: 0 };
     }
   }
 
   return results;
 }
 
-// Save results
 function saveResults(results) {
   const outputDir = path.join(__dirname, '..', 'model-evaluations');
   
@@ -377,7 +300,6 @@ function saveResults(results) {
   const filename = path.join(outputDir, `evaluation-${timestamp}.json`);
   
   fs.writeFileSync(filename, JSON.stringify(results, null, 2));
-  console.log(`\nResults saved to: ${filename}`);
 
   // Save summary
   const summary = Object.entries(results).map(([task, data]) => ({
@@ -386,6 +308,8 @@ function saveResults(results) {
     score: data.selected?.score || 0,
     latencyMs: data.selected?.latencyMs || 0,
     alternatives: data.alternatives?.map(a => a.modelId) || [],
+    totalTested: data.totalTested || 0,
+    totalWorking: data.totalWorking || 0,
   }));
 
   const summaryFile = path.join(outputDir, 'latest-evaluation.json');
@@ -397,7 +321,6 @@ function saveResults(results) {
   return summary;
 }
 
-// Run if executed directly
 if (require.main === module) {
   evaluateModels()
     .then(results => {
@@ -412,12 +335,13 @@ if (require.main === module) {
         console.log(`  Selected: ${item.selectedModel}`);
         console.log(`  Score: ${item.score}/100`);
         console.log(`  Latency: ${item.latencyMs}ms`);
+        console.log(`  Tested: ${item.totalTested} models, ${item.totalWorking} working`);
         if (item.alternatives.length > 0) {
           console.log(`  Alternatives: ${item.alternatives.join(', ')}`);
         }
       });
       
-      // Verify no duplicates
+      // Verify uniqueness
       const selectedModels = summary.map(s => s.selectedModel).filter(m => m !== 'None');
       const uniqueModels = new Set(selectedModels);
       
