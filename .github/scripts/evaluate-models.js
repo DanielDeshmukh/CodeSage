@@ -23,7 +23,7 @@ const MODEL_TASKS = {
       'nvidia/nv-embed-v1',
       'snowflake/arctic-embed-l',
     ],
-    testEndpoint: '/v1/embeddings',
+    testEndpoint: '/embeddings',
     testPayload: (modelId) => ({
       input: 'function hello() { return "world"; }',
       model: modelId,
@@ -41,7 +41,7 @@ const MODEL_TASKS = {
       'nvidia/nv-rerankqa-mistral-4b-v3',
       'nvidia/llama-nemotron-rerank-1b-v2',
     ],
-    testEndpoint: '/v1/ranking',
+    testEndpoint: '/ranking',
     testPayload: (modelId) => ({
       model: modelId,
       query: { text: 'How to implement a binary search?' },
@@ -75,7 +75,7 @@ const MODEL_TASKS = {
       'ibm/granite-34b-code-instruct',
       'deepseek-ai/deepseek-coder-6.7b-instruct',
     ],
-    testEndpoint: '/v1/chat/completions',
+    testEndpoint: '/chat/completions',
     testPayload: (modelId) => ({
       model: modelId,
       messages: [{ role: 'user', content: 'Explain this code: function add(a,b) { return a+b; }' }],
@@ -103,7 +103,7 @@ const MODEL_TASKS = {
       'meta/llama-3.3-70b-instruct',
       'ibm/granite-34b-code-instruct',
     ],
-    testEndpoint: '/v1/chat/completions',
+    testEndpoint: '/chat/completions',
     testPayload: (modelId) => ({
       model: modelId,
       messages: [{ role: 'user', content: 'Evaluate this answer: The function adds two numbers.' }],
@@ -125,7 +125,7 @@ const MODEL_TASKS = {
       'nvidia/nemotron-content-safety-reasoning-4b',
       'meta/llama-guard-4-12b',
     ],
-    testEndpoint: '/v1/chat/completions',
+    testEndpoint: '/chat/completions',
     testPayload: (modelId) => ({
       model: modelId,
       messages: [{ role: 'user', content: 'Hello, how are you?' }],
@@ -244,6 +244,7 @@ async function evaluateModels() {
       }
 
       console.log(`  Testing ${model.id}...`);
+      console.log(`    URL: ${NIM_BASE_URL}${taskConfig.testEndpoint}`);
       
       const testResult = await testModel(model.id, task);
       
