@@ -40,6 +40,11 @@ yarn-error.log*
 
 # local data store
 .repo-store.json
+.exam-store.json
+
+# qdrant (local binary and data)
+qdrant_bin/
+qdrant_data/
 
 # vercel
 .vercel
@@ -47,3 +52,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large root assets (not needed in repo)
+actor.png
+banner.png
+tab-icon.png
+tab-icon.svg
+
+# test screenshots
+e2e/screenshots/

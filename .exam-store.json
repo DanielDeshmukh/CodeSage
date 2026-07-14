@@ -1,44 +1,258 @@
 [
   {
-    "id": "3ac8d8cf-7757-4b0f-93d2-f1d70ebcb5cb",
-    "repositoryId": "repo-aox8w4",
+    "id": "8f4c8c3e-b7eb-4090-b96f-070724c15ea1",
+    "repositoryId": "repo-xhqhjg",
     "mode": "viva",
     "difficulty": "intermediate",
-    "status": "pending",
+    "status": "active",
     "totalScore": 0,
     "maxTotalScore": 0,
-    "questions": [],
+    "questions": [
+      {
+        "id": "VID-001",
+        "question": "Analyze the design decision behind using `date.toISOString().slice(0, 10)` in the `formatDate` function. Discuss the trade-offs of this approach in terms of readability, performance, and cross-browser compatibility. How might this implementation vary if the primary requirement was to display dates in a locale-specific format?",
+        "type": "architecture",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "unknown",
+          "language": "typescript",
+          "chunkName": "formatDate"
+        },
+        "expectedPoints": [
+          "Explanation of the chosen method's impact on readability",
+          "Discussion on performance implications (e.g., method overhead, slicing)",
+          "Analysis of cross-browser compatibility concerns (or lack thereof) with `toISOString()`",
+          "Locale-specific format alternative implementation overview"
+        ],
+        "followUp": "How would you modify `formatDate` to handle invalid input gracefully, and what error handling strategy would you employ?",
+        "sourceChunk": {
+          "id": 1414712628,
+          "name": "formatDate",
+          "filePath": "unknown",
+          "language": "typescript"
+        }
+      },
+      {
+        "id": "VIVA-002",
+        "question": "Analyze the design decision behind using a blanket `except Exception: pass` in the `cleanup` function. Discuss the trade-offs of this approach in terms of **debuggability**, **potential resource leaks**, and **system robustness**. How might this implementation change if the primary requirement was to **ensure all child processes are forcefully terminated without immediate system exit**?",
+        "type": "best-practice",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "unknown",
+          "language": "python",
+          "chunkName": "cleanup"
+        },
+        "expectedPoints": [
+          "Explanation of the implications of catching all exceptions silently",
+          "Discussion on potential resource leaks due to skipped exceptions",
+          "Analysis of system robustness impacts",
+          "Alternative implementation to meet the modified primary requirement"
+        ],
+        "followUp": "Suppose a specific exception type (e.g., `OSError`) is expected during termination. Modify the `cleanup` function to handle this exception explicitly while still terminating all processes before exiting, and justify your changes.",
+        "sourceChunk": {
+          "id": 404607080,
+          "name": "cleanup",
+          "filePath": "unknown",
+          "language": "python"
+        }
+      },
+      {
+        "id": "VIVA-2023-001",
+        "question": "Discuss the architectural implications of invoking `sys.exit(0)` directly within the `cleanup` function after terminating processes. How does this design choice impact the **reusability of the `cleanup` function** across different application contexts (e.g., scripts, web servers, embedded in a larger GUI application)? Propose an alternative implementation that retains the immediate termination guarantee for child processes while making the `cleanup` function more versatile for various deployment scenarios.",
+        "type": "architecture",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "unknown",
+          "language": "python",
+          "chunkName": "cleanup"
+        },
+        "expectedPoints": [
+          "Analysis of `sys.exit(0)` implications on application contexts",
+          "Discussion on reusability limitations of the current design",
+          "Proposed alternative for enhanced versatility (e.g., using callbacks, return values, or context-aware termination strategies)"
+        ],
+        "followUp": "How would your proposed alternative handle cases where the calling application might not want to terminate immediately after cleanup, but rather perform additional recovery or logging operations?",
+        "sourceChunk": {
+          "id": 404607080,
+          "name": "cleanup",
+          "filePath": "unknown",
+          "language": "python"
+        }
+      }
+    ],
     "answers": [],
     "evaluations": [],
-    "startedAt": "2026-07-04T13:24:34.108Z",
+    "startedAt": "2026-07-14T12:28:51.679Z",
     "completedAt": null
   },
   {
-    "id": "f7c7f668-589d-4cd5-8c76-57e8ca8c56ff",
-    "repositoryId": "repo-aox8w4",
+    "id": "084512ef-01e5-4e17-bb72-cc514d373836",
+    "repositoryId": "repo-xhqhjg",
     "mode": "viva",
     "difficulty": "intermediate",
-    "status": "pending",
+    "status": "active",
     "totalScore": 0,
     "maxTotalScore": 0,
-    "questions": [],
+    "questions": [
+      {
+        "id": "VID-2023-001",
+        "question": "Discuss the design decision behind using `date.toISOString().slice(0, 10)` in the `formatDate` function. What trade-offs does this approach present in terms of compatibility, readability, and potential edge cases (e.g., timezone implications)? How might this implementation vary if the primary requirement was to display dates in a user's local timezone?",
+        "type": "conceptual/architecture",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "unknown",
+          "language": "typescript",
+          "chunkName": "formatDate"
+        },
+        "expectedPoints": [
+          "Explanation of `toISOString()` and slicing for date formatting",
+          "Discussion on timezone implications (UTC vs Local Timezone)",
+          "Trade-offs in compatibility (browser/node compatibility, if any)",
+          "Readability and potential for misunderstanding",
+          "Alternative approach for local timezone display"
+        ],
+        "followUp": "How would you modify `formatDate` to handle `null` or invalid date inputs gracefully, and what error handling strategy would you employ?",
+        "sourceChunk": {
+          "id": 1414712628,
+          "name": "formatDate",
+          "filePath": "unknown",
+          "language": "typescript"
+        }
+      }
+    ],
     "answers": [],
     "evaluations": [],
-    "startedAt": "2026-07-04T13:24:45.628Z",
+    "startedAt": "2026-07-14T12:29:51.159Z",
     "completedAt": null
   },
   {
-    "id": "ff7f8fa8-e1e1-4ea1-828c-2980043a6b02",
-    "repositoryId": "repo-aox8w4",
+    "id": "3e478a35-77f6-4098-bf09-4b53311335d4",
+    "repositoryId": "repo-xhqhjg",
     "mode": "viva",
     "difficulty": "intermediate",
-    "status": "pending",
+    "status": "active",
     "totalScore": 0,
     "maxTotalScore": 0,
-    "questions": [],
+    "questions": [
+      {
+        "id": "VIVA-2023-001",
+        "question": "Explain the design decision behind using `date.toISOString().slice(0, 10)` in the `formatDate` function of `ActivityHeatmap.jsx`. Discuss the trade-offs of this approach in terms of browser compatibility, date format consistency, and potential edge cases (e.g., timezone implications). How might this choice impact scalability if this component were to be reused across different regions with varying date format preferences?",
+        "type": "architecture",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "frontend\\src\\components\\ActivityHeatmap.jsx",
+          "language": "typescript",
+          "chunkName": "formatDate"
+        },
+        "expectedPoints": [
+          "Clear explanation of the chosen format (ISO 8601) and its benefits",
+          "Discussion on browser compatibility of `toISOString()`",
+          "Analysis of date format consistency and potential for confusion",
+          "Acknowledgement of timezone implications and how they are handled (or not)",
+          "Thoughts on scalability and reuse across different regions"
+        ],
+        "followUp": "If you were to modify `formatDate` for global compatibility without losing the current format's simplicity, what approach would you take, and why?",
+        "sourceChunk": {
+          "id": 1414712628,
+          "name": "formatDate",
+          "filePath": "frontend\\src\\components\\ActivityHeatmap.jsx",
+          "language": "typescript"
+        }
+      },
+      {
+        "id": "UVQ-001",
+        "question": "Analyzing the `UpdateAccountRequest` class, discuss the design decision behind allowing `name` and `email` to be nullable (set to `None` by default). What are the implications of this choice on the backend's validation logic, database schema design (assuming a relational database), and potential security concerns (e.g., unintentional account anonymization)? How might this decision impact the scalability of user account management in a multi-tenant system?",
+        "type": "conceptual",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "backend\\routers\\settings.py",
+          "language": "python",
+          "chunkName": "UpdateAccountRequest"
+        },
+        "expectedPoints": [
+          "Rationale for nullable fields in request model",
+          "Impact on backend validation logic",
+          "Database schema implications (e.g., NULL constraints)",
+          "Security considerations",
+          "Scalability in multi-tenant environments"
+        ],
+        "followUp": "If you were to revise this design for a system requiring mandatory name and email updates, how would you modify the `UpdateAccountRequest` class and what additional validations would you implement at the backend to ensure data integrity?",
+        "sourceChunk": {
+          "id": 1490623133,
+          "name": "UpdateAccountRequest",
+          "filePath": "backend\\routers\\settings.py",
+          "language": "python"
+        }
+      },
+      {
+        "id": "PRQ-001",
+        "question": "Analyze the design decision behind using optional string and integer types (e.g., `str = None`, `int = None`) for all attributes in the `PreferencesRequest` class. Discuss the implications of this choice on:",
+        "type": "conceptual",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "backend\\routers\\settings.py",
+          "language": "python",
+          "chunkName": "PreferencesRequest"
+        },
+        "expectedPoints": [
+          "Recognition of flexibility vs. data consistency trade-off",
+          "Understanding of backend validation overhead",
+          "Awareness of database storage implications for nullable fields",
+          "Identification of client-side handling complexities",
+          "Discussion on security implications of permissive typing"
+        ],
+        "followUp": "How would you modify the `PreferencesRequest` class to enforce stricter data type consistency while still allowing for optional preferences, and what additional validations would you implement at the backend to ensure data integrity?",
+        "sourceChunk": {
+          "id": 535075619,
+          "name": "PreferencesRequest",
+          "filePath": "backend\\routers\\settings.py",
+          "language": "python"
+        }
+      }
+    ],
     "answers": [],
     "evaluations": [],
-    "startedAt": "2026-07-04T15:19:29.302Z",
+    "startedAt": "2026-07-14T12:42:45.439Z",
+    "completedAt": null
+  },
+  {
+    "id": "b141202e-0fcf-42eb-aaad-4fa7fe24c473",
+    "repositoryId": "repo-xhqhjg",
+    "mode": "viva",
+    "difficulty": "intermediate",
+    "status": "active",
+    "totalScore": 0,
+    "maxTotalScore": 0,
+    "questions": [
+      {
+        "id": "FH-001",
+        "question": "Discuss the design decision behind using `date.toISOString().slice(0, 10)` in the `formatDate` function. What are the trade-offs of this approach in terms of readability, performance, and internationalization? How might this choice impact the component's usability in different locales?",
+        "type": "conceptual",
+        "difficulty": "intermediate",
+        "context": {
+          "filePath": "frontend\\src\\components\\ActivityHeatmap.jsx",
+          "language": "typescript",
+          "chunkName": "formatDate"
+        },
+        "expectedPoints": [
+          "Explanation of the chosen format (YYYY-MM-DD) and its implications",
+          "Analysis of readability (e.g., concise code vs. explicitness)",
+          "Consideration of performance (e.g., native method efficiency)",
+          "Discussion on internationalization (locale sensitivity or lack thereof)",
+          "Example or thought experiment on locale impact"
+        ],
+        "followUp": "How would you modify `formatDate` to make it locale-aware without significantly impacting performance, and what additional dependencies or configurations would this introduce?",
+        "sourceChunk": {
+          "id": 1414712628,
+          "name": "formatDate",
+          "filePath": "frontend\\src\\components\\ActivityHeatmap.jsx",
+          "language": "typescript"
+        }
+      }
+    ],
+    "answers": [],
+    "evaluations": [],
+    "startedAt": "2026-07-14T12:44:11.915Z",
     "completedAt": null
   }
 ]
