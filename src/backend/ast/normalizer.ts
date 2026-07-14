@@ -5,6 +5,7 @@ export interface NormalizedChunk {
   type: "function" | "class" | "module" | "config" | "documentation";
   name: string;
   content: string;
+  filePath: string;
   startLine: number;
   endLine: number;
   lineCount: number;
@@ -43,6 +44,7 @@ export class ChunkNormalizer {
       type: chunk.type,
       name: chunk.name,
       content: chunk.content,
+      filePath,
       startLine: chunk.startLine,
       endLine: chunk.endLine,
       lineCount: chunk.endLine - chunk.startLine + 1,

@@ -75,7 +75,7 @@ export class EmbeddingPipeline {
               chunkId: chunk.id,
               type: chunk.type,
               name: chunk.name,
-              filePath: "",
+              filePath: chunk.filePath,
               language: chunk.language,
               content: chunk.content.slice(0, 10000),
               summary: chunk.summary,
