@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -74,11 +74,14 @@ const difficultyColors: Record<string, "success" | "primary" | "info"> = {
 
 export default function ExamModeSelectionPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const repo = searchParams.get("repo") || "";
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
 
   const handleStartExam = () => {
     if (selectedMode) {
-      router.push(`/exam/${selectedMode}`);
+      const qs = repo ? `?repo=${encodeURIComponent(repo)}` : "";
+      router.push(`/exam/${selectedMode}${qs}`);
     }
   };
 
