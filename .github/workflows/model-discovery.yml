@@ -33,6 +33,7 @@ jobs:
   evaluate-models:
     name: Evaluate NIM Models
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
       - name: Checkout repository

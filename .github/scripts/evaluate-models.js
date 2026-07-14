@@ -156,7 +156,7 @@ function makeRequest(url, options = {}) {
     });
 
     req.on('error', reject);
-    req.setTimeout(15000, () => {
+    req.setTimeout(30000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
@@ -191,10 +191,17 @@ async function testModel(modelId, task) {
 
     const latencyMs = Date.now() - startTime;
     
+    // Check for actual success (not just no error)
+    const success = !response.error && (
+      response.data ||      // embeddings
+      response.choices ||   // chat
+      response.results     // reranking
+    );
+    
     return {
-      success: !response.error && (response.data || response.choices || response.results),
+      success,
       latencyMs,
-      error: response.error?.message || null,
+      error: response.error?.message || (success ? null : 'No valid response'),
     };
   } catch (error) {
     return {
