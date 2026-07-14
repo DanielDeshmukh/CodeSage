@@ -21,7 +21,7 @@ export class EmbeddingService {
         model: this.config.id,
       });
 
-      allEmbeddings.push(...response.data);
+      allEmbeddings.push(...response.data.map((d: any) => d.embedding || d));
     }
 
     return allEmbeddings;

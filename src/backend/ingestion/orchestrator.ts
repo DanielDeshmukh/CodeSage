@@ -253,7 +253,6 @@ export class IngestionOrchestrator {
         chunksEmbedded = embedResult.chunksEmbedded;
       } catch (error) {
         console.warn("Embedding failed (non-fatal):", error);
-        // Continue without embeddings - questions will use content directly
       }
 
       // Stage 8: Complete

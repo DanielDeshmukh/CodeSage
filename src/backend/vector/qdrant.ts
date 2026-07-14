@@ -69,7 +69,7 @@ export class QdrantClient {
         headers: this.getHeaders(),
         body: JSON.stringify({
           vectors: {
-            size: 1024, // Nemotron Embed 1B produces 1024-dimensional vectors
+            size: 2048, // Nemotron Embed 1B v2 produces 2048-dimensional vectors
             distance: "Cosine",
           },
         }),
@@ -85,18 +85,40 @@ export class QdrantClient {
   // --------------------------------------------------------------------------
 
   async upsertPoints(points: QdrantPoint[]): Promise<void> {
-    await fetch(`${this.baseUrl}/collections/${this.collectionName}/points`, {
+    // Qdrant requires UUID or unsigned integer IDs — use numeric hash
+    const numericPoints = points.map((p) => ({
+      id: this.numericId(p.id),
+      vector: Array.isArray(p.vector) ? p.vector.map(Number) : p.vector,
+      payload: p.payload,
+    }));
+
+    const response = await fetch(`${this.baseUrl}/collections/${this.collectionName}/points`, {
       method: "PUT",
       headers: this.getHeaders(),
-      body: JSON.stringify({ points }),
+      body: JSON.stringify({ points: numericPoints }),
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Qdrant upsert failed: ${response.status} ${text}`);
+    }
+  }
+
+  private numericId(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(hash) || 1;
   }
 
   async deletePoints(ids: string[]): Promise<void> {
+    const numericIds = ids.map((id) => this.numericId(id));
     await fetch(`${this.baseUrl}/collections/${this.collectionName}/points/delete`, {
       method: "POST",
       headers: this.getHeaders(),
-      body: JSON.stringify({ points: ids }),
+      body: JSON.stringify({ points: numericIds }),
     });
   }
 
