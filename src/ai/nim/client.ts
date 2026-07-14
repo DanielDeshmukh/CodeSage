@@ -103,7 +103,7 @@ export class NIMClient {
 
   async embed(request: NIMEmbeddingRequest): Promise<NIMEmbeddingResponse> {
     const model = request.model || env.NIM_EMBED_MODEL;
-    const response = await fetch(`${this.baseUrl}/v1/embeddings`, {
+    const response = await fetch(`${this.baseUrl}/embeddings`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({
@@ -123,7 +123,7 @@ export class NIMClient {
 
   async embedQuery(query: string): Promise<number[]> {
     const model = env.NIM_EMBED_MODEL;
-    const response = await fetch(`${this.baseUrl}/v1/embeddings`, {
+    const response = await fetch(`${this.baseUrl}/embeddings`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({
@@ -156,7 +156,7 @@ export class NIMClient {
     }
 
     const model = env.NIM_RERANK_MODEL;
-    const response = await fetch(`${this.baseUrl}/v1/ranking`, {
+    const response = await fetch(`${this.baseUrl}/ranking`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({
@@ -183,7 +183,7 @@ export class NIMClient {
   }
 
   async chat(request: NIMChatRequest): Promise<NIMChatResponse> {
-    const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({
@@ -204,7 +204,7 @@ export class NIMClient {
   }
 
   async checkSafety(request: NIMSafetyRequest): Promise<NIMSafetyResponse> {
-    const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+    const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify({

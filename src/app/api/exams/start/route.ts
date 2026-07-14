@@ -37,8 +37,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to start exam:", error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: "Failed to start exam" },
+      { error: "Failed to start exam", detail: message },
       { status: 500 }
     );
   }
