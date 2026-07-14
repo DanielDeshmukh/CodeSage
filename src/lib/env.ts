@@ -7,12 +7,12 @@ export const env = createEnv({
     NIM_API_KEY: z.string().default(""),
     NIM_BASE_URL: z.string().url("NIM base URL must be a valid URL").default("https://integrate.api.nvidia.com/v1"),
 
-    // Model Endpoints
-    NIM_EMBED_MODEL: z.string().default("nvidia/nv-embedqa-e5-v5"),
+    // Model Endpoints (verified by GitHub Actions workflow)
+    NIM_EMBED_MODEL: z.string().default("nvidia/llama-nemotron-embed-1b-v2"),
     NIM_RERANK_MODEL: z.string().default(""), // Not available in NIM
     NIM_EXAMINER_MODEL: z.string().default("nvidia/llama-3.3-nemotron-super-49b-v1"),
-    NIM_SCORER_MODEL: z.string().default("nvidia/llama-3.3-nemotron-super-49b-v1"),
-    NIM_SAFETY_MODEL: z.string().default("nvidia/nemotron-3.5-content-safety"),
+    NIM_SCORER_MODEL: z.string().default("nvidia/nemotron-3-super-120b-a12b"),
+    NIM_SAFETY_MODEL: z.string().default("nvidia/llama-3.1-nemoguard-8b-content-safety"),
 
     // Qdrant Configuration
     QDRANT_URL: z.string().url("Qdrant URL must be a valid URL").default("http://localhost:6333"),

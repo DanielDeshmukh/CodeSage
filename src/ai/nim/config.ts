@@ -13,20 +13,20 @@ export interface NIMModelConfig {
 
 export const NIM_MODELS = {
   embedding: {
-    id: "nvidia/nv-embedqa-e5-v5",
-    name: "NV-Embed-QA",
+    id: "nvidia/llama-nemotron-embed-1b-v2",
+    name: "Nemotron-Embed-1B-v2",
     endpoint: "/v1/embeddings",
     dimensions: 768,
     maxBatchSize: 128,
-    description: "High-quality text embeddings for semantic search",
+    description: "Code embedding for semantic search (verified by workflow, 565ms)",
   } as const,
 
   reranker: {
-    id: "nvidia/nv-rerankqa-mistral-4b-v3",
-    name: "NV-Rerank-QA",
+    id: "",
+    name: "No Reranker",
     endpoint: "/v1/ranking",
     maxDocuments: 100,
-    description: "Document reranking for improved retrieval relevance",
+    description: "Skipped - no NIM reranker available, using embedding similarity directly",
   } as const,
 
   examiner: {
@@ -36,26 +36,26 @@ export const NIM_MODELS = {
     maxTokens: 4096,
     temperature: 0.7,
     topP: 0.9,
-    description: "Question generation and conversational AI",
+    description: "Question generation and code analysis (verified by workflow, 1806ms)",
   } as const,
 
   scorer: {
-    id: "nvidia/nemotron-4-340b-reward",
-    name: "Nemotron-340B-Reward",
+    id: "nvidia/nemotron-3-super-120b-a12b",
+    name: "Nemotron-3-Super-120B",
     endpoint: "/v1/chat/completions",
     maxTokens: 2048,
     temperature: 0.3,
     topP: 0.95,
-    description: "Objective answer scoring and evaluation",
+    description: "Answer scoring and evaluation (verified by workflow, 577ms)",
   } as const,
 
   safety: {
-    id: "nvidia/nemotron-3.5-content-safety",
-    name: "Nemotron-Content-Safety",
+    id: "nvidia/llama-3.1-nemoguard-8b-content-safety",
+    name: "Nemoguard-8B-Safety",
     endpoint: "/v1/chat/completions",
     maxTokens: 256,
     temperature: 0.1,
-    description: "Content safety classification and moderation",
+    description: "Content safety classification (verified by workflow, 328ms)",
   } as const,
 } as const;
 
