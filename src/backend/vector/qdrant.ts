@@ -31,10 +31,26 @@ export class QdrantClient {
   private baseUrl: string;
   private apiKey?: string;
   private collectionName = "code_chunks";
+  private _available: boolean | null = null;
 
   constructor() {
     this.baseUrl = env.QDRANT_URL;
     this.apiKey = env.QDRANT_API_KEY;
+  }
+
+  async isAvailable(): Promise<boolean> {
+    if (this._available !== null) return this._available;
+    try {
+      const res = await fetch(`${this.baseUrl}/collections`, {
+        method: "GET",
+        headers: this.getHeaders(),
+        signal: AbortSignal.timeout(3000),
+      });
+      this._available = res.ok;
+    } catch {
+      this._available = false;
+    }
+    return this._available;
   }
 
   private getHeaders(): HeadersInit {
@@ -52,6 +68,7 @@ export class QdrantClient {
   // --------------------------------------------------------------------------
 
   async ensureCollection(): Promise<void> {
+    if (!(await this.isAvailable())) return;
     try {
       // Check if collection exists
       const response = await fetch(
@@ -85,6 +102,7 @@ export class QdrantClient {
   // --------------------------------------------------------------------------
 
   async upsertPoints(points: QdrantPoint[]): Promise<void> {
+    if (!(await this.isAvailable())) return;
     // Qdrant requires UUID or unsigned integer IDs — use numeric hash
     const numericPoints = points.map((p) => ({
       id: this.numericId(p.id),
@@ -114,6 +132,7 @@ export class QdrantClient {
   }
 
   async deletePoints(ids: string[]): Promise<void> {
+    if (!(await this.isAvailable())) return;
     const numericIds = ids.map((id) => this.numericId(id));
     await fetch(`${this.baseUrl}/collections/${this.collectionName}/points/delete`, {
       method: "POST",
@@ -140,6 +159,7 @@ export class QdrantClient {
       payload: QdrantPoint["payload"];
     }[]
   > {
+    if (!(await this.isAvailable())) return [];
     const filter: Record<string, unknown> = {};
 
     if (options.filter?.repositoryId || options.filter?.type || options.filter?.language) {
@@ -208,6 +228,7 @@ export class QdrantClient {
     repositoryId: string,
     limit: number = 1000
   ): Promise<QdrantPoint[]> {
+    if (!(await this.isAvailable())) return [];
     const response = await fetch(
       `${this.baseUrl}/collections/${this.collectionName}/points/scroll`,
       {
@@ -248,6 +269,7 @@ export class QdrantClient {
   // --------------------------------------------------------------------------
 
   async deleteByRepository(repositoryId: string): Promise<void> {
+    if (!(await this.isAvailable())) return;
     await fetch(`${this.baseUrl}/collections/${this.collectionName}/points/delete`, {
       method: "POST",
       headers: this.getHeaders(),
@@ -273,6 +295,9 @@ export class QdrantClient {
     vectorsSize: number;
     status: string;
   }> {
+    if (!(await this.isAvailable())) {
+      return { pointsCount: 0, vectorsSize: 0, status: "unavailable" };
+    }
     const response = await fetch(
       `${this.baseUrl}/collections/${this.collectionName}`,
       { headers: this.getHeaders() }
@@ -295,6 +320,9 @@ export class QdrantClient {
     languages: Record<string, number>;
     types: Record<string, number>;
   }> {
+    if (!(await this.isAvailable())) {
+      return { totalChunks: 0, languages: {}, types: {} };
+    }
     const points = await this.scrollByRepository(repositoryId, 10000);
 
     const languages: Record<string, number> = {};

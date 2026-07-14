@@ -12,30 +12,31 @@ describe("QdrantClient", () => {
   describe("ensureCollection", () => {
     it("should create collection if not exists", async () => {
       (global.fetch as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce({ ok: false })
-        .mockResolvedValueOnce({ ok: true });
+        .mockResolvedValueOnce({ ok: true }) // isAvailable check
+        .mockResolvedValueOnce({ ok: false }) // GET collection
+        .mockResolvedValueOnce({ ok: true }); // PUT create
+
+      await client.ensureCollection();
+
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+    });
+
+    it("should not create if exists", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({ ok: true }) // isAvailable check
+        .mockResolvedValueOnce({ ok: true }); // GET collection
 
       await client.ensureCollection();
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
-
-    it("should not create if exists", async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        ok: true,
-      });
-
-      await client.ensureCollection();
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe("upsertPoints", () => {
     it("should upsert points to collection", async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        ok: true,
-      });
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({ ok: true }) // isAvailable check
+        .mockResolvedValueOnce({ ok: true }); // upsert
 
       await client.upsertPoints([
         {
@@ -86,10 +87,12 @@ describe("QdrantClient", () => {
         ],
       };
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockResult),
-      });
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({ ok: true }) // isAvailable check
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockResult),
+        }); // search
 
       const results = await client.search([0.1, 0.2, 0.3], {
         filter: { repositoryId: "repo1" },
@@ -138,10 +141,12 @@ describe("QdrantClient", () => {
         },
       ];
 
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ result: { points: mockPoints } }),
-      });
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({ ok: true }) // isAvailable check
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ result: { points: mockPoints } }),
+        }); // scroll
 
       const stats = await client.getRepositoryStats("repo1");
 
