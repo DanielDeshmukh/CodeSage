@@ -4,6 +4,9 @@ import { isDatabaseAvailable, query, queryOne, execute } from "./database/client
 
 const DATA_PATH = join(process.cwd(), ".exam-store.json");
 
+// In-memory fallback for serverless environments (Vercel)
+let inMemoryStore: ExamRecord[] = [];
+
 export interface ExamRecord {
   id: string;
   repositoryId: string;
@@ -27,11 +30,16 @@ function loadFile(): ExamRecord[] {
       return JSON.parse(readFileSync(DATA_PATH, "utf-8"));
     }
   } catch {}
-  return [];
+  return inMemoryStore;
 }
 
 function saveFile(exams: ExamRecord[]) {
-  writeFileSync(DATA_PATH, JSON.stringify(exams, null, 2));
+  try {
+    writeFileSync(DATA_PATH, JSON.stringify(exams, null, 2));
+  } catch {
+    // Filesystem read-only (Vercel) — use in-memory store
+    inMemoryStore = exams;
+  }
 }
 
 // --- PostgreSQL operations ---

@@ -4,6 +4,9 @@ import { isDatabaseAvailable, query, queryOne, execute } from "./database/client
 
 const DATA_PATH = join(process.cwd(), ".repo-store.json");
 
+// In-memory fallback for serverless environments (Vercel) where filesystem is read-only
+let inMemoryStore: RepoRecord[] = [];
+
 export interface RepoRecord {
   id: string;
   name: string;
@@ -20,11 +23,16 @@ function loadFile(): RepoRecord[] {
       return JSON.parse(readFileSync(DATA_PATH, "utf-8"));
     }
   } catch {}
-  return [];
+  return inMemoryStore;
 }
 
 function saveFile(repos: RepoRecord[]) {
-  writeFileSync(DATA_PATH, JSON.stringify(repos, null, 2));
+  try {
+    writeFileSync(DATA_PATH, JSON.stringify(repos, null, 2));
+  } catch {
+    // Filesystem read-only (Vercel) — use in-memory store
+    inMemoryStore = repos;
+  }
 }
 
 // --- PostgreSQL operations ---

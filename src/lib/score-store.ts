@@ -4,6 +4,9 @@ import { isDatabaseAvailable, query, execute } from "./database/client";
 
 const DATA_PATH = join(process.cwd(), ".score-store.json");
 
+// In-memory fallback for serverless environments (Vercel)
+let inMemoryStore: ScoreRecord[] = [];
+
 export interface ScoreRecord {
   id: string;
   examId: string;
@@ -21,11 +24,16 @@ function loadFile(): ScoreRecord[] {
       return JSON.parse(readFileSync(DATA_PATH, "utf-8"));
     }
   } catch {}
-  return [];
+  return inMemoryStore;
 }
 
 function saveFile(scores: ScoreRecord[]) {
-  writeFileSync(DATA_PATH, JSON.stringify(scores, null, 2));
+  try {
+    writeFileSync(DATA_PATH, JSON.stringify(scores, null, 2));
+  } catch {
+    // Filesystem read-only (Vercel) — use in-memory store
+    inMemoryStore = scores;
+  }
 }
 
 // --- PostgreSQL (store in exam_sessions table via total_score) ---
