@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
     }
 
     const examLoop = getExamLoop();
+    console.log(`[ExamStart] Starting exam for repo=${repositoryId}, mode=${mode}`);
+    const startTime = Date.now();
     const session = await examLoop.startExam({
       repositoryId,
       mode,
@@ -28,6 +30,7 @@ export async function POST(request: NextRequest) {
       questionCount: questionCount || 1,
       timeLimitMs: timeLimitMs || 1800000,
     });
+    console.log(`[ExamStart] Exam started in ${Date.now() - startTime}ms, questions=${session.questions.length}`);
 
     return NextResponse.json({
       sessionId: session.id,
@@ -38,6 +41,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Failed to start exam:", error);
     const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : "";
+    console.error("Exam start stack:", stack);
     return NextResponse.json(
       { error: "Failed to start exam", detail: message },
       { status: 500 }

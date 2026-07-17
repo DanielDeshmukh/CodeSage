@@ -79,7 +79,8 @@ export default function ExamSessionPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to start exam session");
+        const detail = errorData.detail ? ` (${errorData.detail})` : "";
+        throw new Error(errorData.error + detail || "Failed to start exam session");
       }
 
       const data: ExamSession = await response.json();
