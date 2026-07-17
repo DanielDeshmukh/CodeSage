@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/exams/start.ts": { "maxDuration": 10 },
-    "api/exams/**/route.ts": { "maxDuration": 10 },
-    "api/repos/ingest.ts": { "maxDuration": 10 }
-  },
   "headers": [
     {
       "source": "/(.*)",
