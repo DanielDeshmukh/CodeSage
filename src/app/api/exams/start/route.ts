@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       repositoryId,
       mode,
       difficulty: difficulty || "intermediate",
-      questionCount: questionCount || 1,
+      questionCount: questionCount || 3,
       timeLimitMs: timeLimitMs || 1800000,
     });
     console.log(`[ExamStart] Exam started in ${Date.now() - startTime}ms, questions=${session.questions.length}`);

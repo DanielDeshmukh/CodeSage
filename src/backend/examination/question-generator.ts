@@ -153,26 +153,24 @@ export class QuestionGenerator {
 
   async generateQuestionSet(
     options: QuestionGenerationOptions,
-    count: number = 5
+    count: number = 3
   ): Promise<GeneratedQuestion[]> {
-    const questions: GeneratedQuestion[] = [];
-    const previousQuestions: string[] = [];
+    // Generate questions in parallel for speed (avoids Vercel timeout)
+    const queries = Array.from({ length: count }, (_, i) =>
+      this.getQueryForIndex(i, options.mode)
+    );
 
-    for (let i = 0; i < count; i++) {
-      const query = this.getQueryForIndex(i, options.mode);
-      const question = await this.generateQuestion({
-        ...options,
-        query,
-        previousQuestions,
-      });
+    const results = await Promise.allSettled(
+      queries.map((query) =>
+        this.generateQuestion({ ...options, query, previousQuestions: [] })
+      )
+    );
 
-      if (question) {
-        questions.push(question);
-        previousQuestions.push(question.question);
-      }
-    }
-
-    return questions;
+    return results
+      .filter((r): r is PromiseFulfilledResult<GeneratedQuestion> =>
+        r.status === "fulfilled" && r.value !== null
+      )
+      .map((r) => r.value);
   }
 
   private getQueryForIndex(index: number, mode: ExamMode): string {

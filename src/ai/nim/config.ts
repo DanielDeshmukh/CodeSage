@@ -33,7 +33,7 @@ export const NIM_MODELS = {
     id: "nvidia/llama-3.3-nemotron-super-49b-v1",
     name: "Nemotron-Super-49B",
     endpoint: "/v1/chat/completions",
-    maxTokens: 4096,
+    maxTokens: 1024,
     temperature: 0.7,
     topP: 0.9,
     description: "Question generation and code analysis (verified by workflow, 1806ms)",
