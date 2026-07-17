@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       repositoryId,
       mode,
       difficulty: difficulty || "intermediate",
-      questionCount: questionCount || 5,
+      questionCount: questionCount || 1,
       timeLimitMs: timeLimitMs || 1800000,
     });
 
