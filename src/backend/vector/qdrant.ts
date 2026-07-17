@@ -30,12 +30,13 @@ export interface SearchFilter {
 export class QdrantClient {
   private baseUrl: string;
   private apiKey?: string;
-  private collectionName = "code_chunks";
+  private collectionName: string;
   private _available: boolean | null = null;
 
   constructor() {
     this.baseUrl = env.QDRANT_URL;
     this.apiKey = env.QDRANT_API_KEY;
+    this.collectionName = env.QDRANT_COLLECTION || "code_chunks";
   }
 
   async isAvailable(): Promise<boolean> {
@@ -44,10 +45,12 @@ export class QdrantClient {
       const res = await fetch(`${this.baseUrl}/collections`, {
         method: "GET",
         headers: this.getHeaders(),
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(10000),
       });
+      console.log(`[Qdrant] Health check: ${res.status} ${res.statusText}`);
       this._available = res.ok;
-    } catch {
+    } catch (e) {
+      console.error("[Qdrant] Health check failed:", e);
       this._available = false;
     }
     return this._available;
@@ -203,6 +206,8 @@ export class QdrantClient {
     );
 
     if (!response.ok) {
+      const text = await response.text();
+      console.error(`[Qdrant] Search failed: ${response.status} ${text}`);
       throw new Error(`Search failed: ${response.statusText}`);
     }
 

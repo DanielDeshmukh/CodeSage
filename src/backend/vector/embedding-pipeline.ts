@@ -42,9 +42,13 @@ export class EmbeddingPipeline {
     let chunksEmbedded = 0;
     let vectorsStored = 0;
 
+    console.log(`[EmbeddingPipeline] Starting: ${chunks.length} chunks for repo ${repositoryId}`);
+
     try {
       // Ensure collection exists
       await this.qdrantClient.ensureCollection();
+      const available = await this.qdrantClient.isAvailable();
+      console.log(`[EmbeddingPipeline] Qdrant available: ${available}`);
 
       // Process in batches
       for (let i = 0; i < chunks.length; i += this.batchSize) {
@@ -96,6 +100,7 @@ export class EmbeddingPipeline {
           await this.qdrantClient.upsertPoints(points);
           vectorsStored += points.length;
           chunksEmbedded += batch.length;
+          console.log(`[EmbeddingPipeline] Stored batch ${Math.floor(i / this.batchSize) + 1}: ${points.length} points (total: ${vectorsStored})`);
         } catch (error) {
           const errorMsg = `Batch ${Math.floor(i / this.batchSize) + 1}: ${error instanceof Error ? error.message : "Unknown error"}`;
           errors.push(errorMsg);

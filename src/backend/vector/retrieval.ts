@@ -49,8 +49,11 @@ export class RetrievalPipeline {
       minScore = 0.3,
     } = options;
 
+    console.log(`[Retrieval] Query: "${query}" for repo: ${repositoryId}`);
+
     // Stage 1: Vector search (top-10 candidates)
     const queryEmbedding = await this.embeddingService.embedSingle(query);
+    console.log(`[Retrieval] Query embedding dimensions: ${queryEmbedding.length}`);
 
     const candidates = await this.qdrantClient.search(queryEmbedding, {
       filter: {
@@ -60,6 +63,8 @@ export class RetrievalPipeline {
       limit: topK * 2,
       scoreThreshold: minScore,
     });
+
+    console.log(`[Retrieval] Found ${candidates.length} candidates`);
 
     // Stage 2: Rerank (top-3 final results)
     if (candidates.length === 0) {
