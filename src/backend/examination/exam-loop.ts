@@ -8,6 +8,7 @@ import {
   type ExamAnswer,
   type ExamEvaluation,
 } from "./session";
+import { updateExam } from "@/lib/exam-store";
 import { getQuestionGenerator, type GeneratedQuestion } from "./question-generator";
 import { getAnswerEvaluator } from "./answer-evaluator";
 import { getFeedbackGenerator, type FeedbackResult } from "./feedback-generator";
@@ -77,17 +78,22 @@ export class ExamLoop {
         mode: options.mode,
         difficulty: options.difficulty || "intermediate",
       },
-      options.questionCount || 5
+      options.questionCount || 1
     );
 
     for (const question of questions) {
-      await this.sessionManager.addQuestion(sessionId, question);
+      session.questions.push(question);
     }
 
-    // Start the session
-    await this.sessionManager.startSession(sessionId);
+    // Persist and start the session
+    await updateExam(sessionId, {
+      status: "active",
+      startedAt: new Date().toISOString(),
+      questions: session.questions,
+    });
 
-    return (await this.sessionManager.getSession(sessionId))!;
+    session.status = "active";
+    return session;
   }
 
   async submitAnswer(
