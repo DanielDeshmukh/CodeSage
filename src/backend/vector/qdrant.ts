@@ -79,21 +79,35 @@ export class QdrantClient {
         { headers: this.getHeaders() }
       );
 
-      if (response.ok) {
-        return; // Collection exists
+      if (!response.ok) {
+        // Create collection
+        await fetch(`${this.baseUrl}/collections/${this.collectionName}`, {
+          method: "PUT",
+          headers: this.getHeaders(),
+          body: JSON.stringify({
+            vectors: {
+              size: 2048,
+              distance: "Cosine",
+            },
+          }),
+        });
       }
 
-      // Create collection
-      await fetch(`${this.baseUrl}/collections/${this.collectionName}`, {
-        method: "PUT",
-        headers: this.getHeaders(),
-        body: JSON.stringify({
-          vectors: {
-            size: 2048, // Nemotron Embed 1B v2 produces 2048-dimensional vectors
-            distance: "Cosine",
-          },
-        }),
-      });
+      // Create payload indexes for filtered search (required by Qdrant Cloud)
+      const indexFields = ["repositoryId", "type", "language"];
+      for (const field of indexFields) {
+        await fetch(
+          `${this.baseUrl}/collections/${this.collectionName}/index`,
+          {
+            method: "PUT",
+            headers: this.getHeaders(),
+            body: JSON.stringify({
+              field_name: field,
+              field_schema: "keyword",
+            }),
+          }
+        );
+      }
     } catch (error) {
       console.error("Failed to ensure collection:", error);
       throw error;

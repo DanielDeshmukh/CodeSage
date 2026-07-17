@@ -14,21 +14,27 @@ describe("QdrantClient", () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({ ok: true }) // isAvailable check
         .mockResolvedValueOnce({ ok: false }) // GET collection
-        .mockResolvedValueOnce({ ok: true }); // PUT create
+        .mockResolvedValueOnce({ ok: true }) // PUT create
+        .mockResolvedValueOnce({ ok: true }) // index repositoryId
+        .mockResolvedValueOnce({ ok: true }) // index type
+        .mockResolvedValueOnce({ ok: true }); // index language
 
       await client.ensureCollection();
 
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(global.fetch).toHaveBeenCalledTimes(6);
     });
 
     it("should not create if exists", async () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({ ok: true }) // isAvailable check
-        .mockResolvedValueOnce({ ok: true }); // GET collection
+        .mockResolvedValueOnce({ ok: true }) // GET collection
+        .mockResolvedValueOnce({ ok: true }) // index repositoryId
+        .mockResolvedValueOnce({ ok: true }) // index type
+        .mockResolvedValueOnce({ ok: true }); // index language
 
       await client.ensureCollection();
 
-      expect(global.fetch).toHaveBeenCalledTimes(2);
+      expect(global.fetch).toHaveBeenCalledTimes(5);
     });
   });
 
