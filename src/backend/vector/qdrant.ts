@@ -79,38 +79,56 @@ export class QdrantClient {
         { headers: this.getHeaders() }
       );
 
-      if (!response.ok) {
-        // Create collection
-        await fetch(`${this.baseUrl}/collections/${this.collectionName}`, {
-          method: "PUT",
-          headers: this.getHeaders(),
-          body: JSON.stringify({
-            vectors: {
-              size: 2048,
-              distance: "Cosine",
-            },
-          }),
-        });
+      if (response.ok) {
+        // Check vector dimensions match
+        const data = await response.json();
+        const existingSize = data.result?.config?.params?.vectors?.size;
+        if (existingSize && existingSize !== 2048) {
+          console.log(`[Qdrant] Collection has dim=${existingSize}, need 2048. Recreating...`);
+          await fetch(`${this.baseUrl}/collections/${this.collectionName}`, {
+            method: "DELETE",
+            headers: this.getHeaders(),
+          });
+        } else {
+          // Dimensions match, just ensure indexes exist
+          await this.ensureIndexes();
+          return;
+        }
       }
 
-      // Create payload indexes for filtered search (required by Qdrant Cloud)
-      const indexFields = ["repositoryId", "type", "language"];
-      for (const field of indexFields) {
-        await fetch(
-          `${this.baseUrl}/collections/${this.collectionName}/index`,
-          {
-            method: "PUT",
-            headers: this.getHeaders(),
-            body: JSON.stringify({
-              field_name: field,
-              field_schema: "keyword",
-            }),
-          }
-        );
-      }
+      // Create collection with correct dimensions
+      await fetch(`${this.baseUrl}/collections/${this.collectionName}`, {
+        method: "PUT",
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          vectors: {
+            size: 2048,
+            distance: "Cosine",
+          },
+        }),
+      });
+
+      await this.ensureIndexes();
     } catch (error) {
       console.error("Failed to ensure collection:", error);
       throw error;
+    }
+  }
+
+  private async ensureIndexes(): Promise<void> {
+    const indexFields = ["repositoryId", "type", "language"];
+    for (const field of indexFields) {
+      await fetch(
+        `${this.baseUrl}/collections/${this.collectionName}/index`,
+        {
+          method: "PUT",
+          headers: this.getHeaders(),
+          body: JSON.stringify({
+            field_name: field,
+            field_schema: "keyword",
+          }),
+        }
+      );
     }
   }
 

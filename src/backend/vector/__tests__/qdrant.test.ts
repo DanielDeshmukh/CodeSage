@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { QdrantClient } from "../qdrant";
 
+function mockJson(data: unknown) {
+  return { ok: true, json: () => Promise.resolve(data) };
+}
+
 describe("QdrantClient", () => {
   let client: QdrantClient;
 
@@ -13,7 +17,7 @@ describe("QdrantClient", () => {
     it("should create collection if not exists", async () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({ ok: true }) // isAvailable check
-        .mockResolvedValueOnce({ ok: false }) // GET collection
+        .mockResolvedValueOnce({ ok: false }) // GET collection (not found)
         .mockResolvedValueOnce({ ok: true }) // PUT create
         .mockResolvedValueOnce({ ok: true }) // index repositoryId
         .mockResolvedValueOnce({ ok: true }) // index type
@@ -24,10 +28,10 @@ describe("QdrantClient", () => {
       expect(global.fetch).toHaveBeenCalledTimes(6);
     });
 
-    it("should not create if exists", async () => {
+    it("should not create if exists with correct dimensions", async () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({ ok: true }) // isAvailable check
-        .mockResolvedValueOnce({ ok: true }) // GET collection
+        .mockResolvedValueOnce(mockJson({ result: { config: { params: { vectors: { size: 2048 } } } } })) // GET collection
         .mockResolvedValueOnce({ ok: true }) // index repositoryId
         .mockResolvedValueOnce({ ok: true }) // index type
         .mockResolvedValueOnce({ ok: true }); // index language
@@ -35,6 +39,21 @@ describe("QdrantClient", () => {
       await client.ensureCollection();
 
       expect(global.fetch).toHaveBeenCalledTimes(5);
+    });
+
+    it("should recreate collection if dimensions mismatch", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({ ok: true }) // isAvailable check
+        .mockResolvedValueOnce(mockJson({ result: { config: { params: { vectors: { size: 1024 } } } } })) // GET collection (wrong dim)
+        .mockResolvedValueOnce({ ok: true }) // DELETE collection
+        .mockResolvedValueOnce({ ok: true }) // PUT create
+        .mockResolvedValueOnce({ ok: true }) // index repositoryId
+        .mockResolvedValueOnce({ ok: true }) // index type
+        .mockResolvedValueOnce({ ok: true }); // index language
+
+      await client.ensureCollection();
+
+      expect(global.fetch).toHaveBeenCalledTimes(7);
     });
   });
 
