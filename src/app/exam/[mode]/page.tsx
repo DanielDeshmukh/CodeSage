@@ -48,7 +48,6 @@ interface AnswerResponse {
   isComplete: boolean;
   session?: ExamSession;
 }
-}
 
 export default function ExamSessionPage() {
   const params = useParams();
