@@ -22,9 +22,18 @@ interface Question {
 
 interface ExamSession {
   sessionId: string;
+  repositoryId: string;
+  mode: string;
+  difficulty: string;
   status: string;
   questions: Question[];
+  answers: Array<{ questionId: string; answer: string; timestamp: string; timeSpentMs: number }>;
+  evaluations: Array<{ questionId: string; score: number; maxScore: number; breakdown: Record<string, number>; feedback: string; matchedPoints: string[]; missedPoints: string[] }>;
+  totalScore: number;
+  maxTotalScore: number;
   timeLimitMs: number;
+  startedAt: string;
+  completedAt: string | null;
 }
 
 interface Evaluation {
@@ -37,6 +46,8 @@ interface AnswerResponse {
   evaluation: Evaluation;
   followUp: Question | null;
   isComplete: boolean;
+  session?: ExamSession;
+}
 }
 
 export default function ExamSessionPage() {
@@ -85,6 +96,8 @@ export default function ExamSessionPage() {
 
       const data: ExamSession = await response.json();
       setSession(data);
+      // Persist to localStorage for Vercel serverless stateless workaround
+      localStorage.setItem(`exam-${data.sessionId}`, JSON.stringify(data));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to start exam session");
     } finally {
@@ -127,7 +140,7 @@ export default function ExamSessionPage() {
       const response = await fetch(`/api/exams/${session.sessionId}/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answer }),
+        body: JSON.stringify({ answer, session }),
       });
 
       if (!response.ok) {
@@ -139,6 +152,12 @@ export default function ExamSessionPage() {
       setLastEvaluation(data.evaluation);
       setAnswers((prev) => ({ ...prev, [currentQuestion.id]: answer }));
       setAnswer("");
+
+      // Update session from server response (persisted state)
+      if (data.session) {
+        setSession(data.session);
+        localStorage.setItem(`exam-${session.sessionId}`, JSON.stringify(data.session));
+      }
 
       // Handle follow-up question
       if (data.followUp) {

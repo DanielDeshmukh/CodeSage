@@ -34,9 +34,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       sessionId: session.id,
+      repositoryId: session.repositoryId,
+      mode: session.mode,
+      difficulty: session.difficulty,
       status: session.status,
       questions: session.questions,
+      answers: session.answers,
+      evaluations: session.evaluations,
+      totalScore: session.totalScore,
+      maxTotalScore: session.maxTotalScore,
       timeLimitMs: session.timeLimitMs,
+      startedAt: session.startedAt?.toISOString() || new Date().toISOString(),
+      completedAt: session.completedAt?.toISOString() || null,
     });
   } catch (error) {
     console.error("Failed to start exam:", error);

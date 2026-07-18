@@ -8,7 +8,7 @@ import {
   type ExamAnswer,
   type ExamEvaluation,
 } from "./session";
-import { updateExam } from "@/lib/exam-store";
+import { updateExam, addExam } from "@/lib/exam-store";
 import { getQuestionGenerator, type GeneratedQuestion } from "./question-generator";
 import { getAnswerEvaluator } from "./answer-evaluator";
 import { getFeedbackGenerator, type FeedbackResult } from "./feedback-generator";
@@ -255,7 +255,45 @@ export class ExamLoop {
       timeRemaining: remaining,
     };
   }
+
+  async getSession(sessionId: string): Promise<ExamSession | null> {
+    return this.sessionManager.getSession(sessionId);
+  }
+
+  async restoreSession(sessionId: string, data: ExamSessionData): Promise<ExamSession> {
+    // Reconstruct session from client-provided data
+    const record = {
+      id: sessionId,
+      repositoryId: data.repositoryId,
+      mode: data.mode,
+      difficulty: data.difficulty,
+      status: data.status,
+      totalScore: data.totalScore,
+      maxTotalScore: data.maxTotalScore,
+      questions: data.questions,
+      answers: data.answers,
+      evaluations: data.evaluations,
+      startedAt: data.startedAt,
+      completedAt: data.completedAt,
+    };
+    await addExam(record);
+    return this.sessionManager.getSession(sessionId) as Promise<ExamSession>;
+  }
 }
+
+export type ExamSessionData = {
+  repositoryId: string;
+  mode: string;
+  difficulty: string;
+  status: string;
+  totalScore: number;
+  maxTotalScore: number;
+  questions: ExamQuestion[];
+  answers: ExamAnswer[];
+  evaluations: ExamEvaluation[];
+  startedAt: string;
+  completedAt: string | null;
+};
 
 let instance: ExamLoop | null = null;
 
