@@ -15,6 +15,7 @@ export interface QuestionGenerationOptions {
   query?: string;
   questionCount?: number;
   previousQuestions?: string[];
+  excludeChunkIds?: string[];
 }
 
 export interface GeneratedQuestion extends ExamQuestion {
@@ -41,6 +42,7 @@ export class QuestionGenerator {
       query = "complex logic error handling",
       questionCount = 1,
       previousQuestions = [],
+      excludeChunkIds = [],
     } = options;
 
     let context: PromptContext;
@@ -51,12 +53,17 @@ export class QuestionGenerator {
       const retrievalResult = await this.retrievalPipeline.retrieve({
         repositoryId,
         query,
-        topK: 3,
-        rerankTopN: 3,
+        topK: 5,
+        rerankTopN: 5,
       });
 
-      if (retrievalResult.chunks.length > 0) {
-        chunk = retrievalResult.chunks[0];
+      // Pick first chunk that hasn't been used yet
+      const available = retrievalResult.chunks.filter(
+        (c) => !excludeChunkIds.includes(c.id)
+      );
+
+      if (available.length > 0) {
+        chunk = available[0];
         context = {
           repositoryId,
           language: chunk.language,
@@ -155,22 +162,29 @@ export class QuestionGenerator {
     options: QuestionGenerationOptions,
     count: number = 3
   ): Promise<GeneratedQuestion[]> {
-    // Generate questions in parallel for speed (avoids Vercel timeout)
     const queries = Array.from({ length: count }, (_, i) =>
       this.getQueryForIndex(i, options.mode)
     );
 
-    const results = await Promise.allSettled(
-      queries.map((query) =>
-        this.generateQuestion({ ...options, query, previousQuestions: [] })
-      )
-    );
+    const usedChunkIds = new Set<string>();
+    const questions: GeneratedQuestion[] = [];
 
-    return results
-      .filter((r): r is PromiseFulfilledResult<GeneratedQuestion> =>
-        r.status === "fulfilled" && r.value !== null
-      )
-      .map((r) => r.value);
+    // Generate sequentially to exclude used chunks from next retrieval
+    for (const query of queries) {
+      const question = await this.generateQuestion({
+        ...options,
+        query,
+        previousQuestions: questions.map((q) => q.question),
+        excludeChunkIds: [...usedChunkIds],
+      });
+
+      if (question) {
+        questions.push(question);
+        usedChunkIds.add(question.sourceChunk.id);
+      }
+    }
+
+    return questions;
   }
 
   private getQueryForIndex(index: number, mode: ExamMode): string {
